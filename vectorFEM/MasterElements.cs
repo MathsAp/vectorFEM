@@ -64,7 +64,7 @@ namespace FEM
             QuadratureNodes = NumericalIntegration.FactoryQuadratures3D(order, ElemType.Cube);
             PsiValues = MasterElementAlgorithms.CalcScalarPsiValues(n, QuadratureNodes);
             PsiPsiMatrix = MasterElementAlgorithms.CalcScalarPsiPsiMatrix(n, QuadratureNodes, PsiValues);
-
+            GradValues = MasterElementAlgorithms.CalcGradValues(n, QuadratureNodes);
         }
 
         public static CubeMasterElementLinearScalarBasis GetInstance()

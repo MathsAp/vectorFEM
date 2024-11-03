@@ -35,9 +35,9 @@ namespace FEM
         double GetValueAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить значение в точке на конечном элементе
         Vector2D GetGradientAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить градиент в точке на конечном элементе
     }
-    public interface IFiniteElementWithNumericIntegration<T1, T2> : IFiniteElement
+    public interface IFiniteElementWithNumericIntegration<T1, T2, T3> : IFiniteElement
     {
-        IMasterElement<T1, T2> MasterElement { get; }
+        IMasterElement<T1, T2, T3> MasterElement { get; }
     }
 
     public interface IFiniteElementMesh
