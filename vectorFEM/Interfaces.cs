@@ -1,0 +1,139 @@
+using System.Collections.Generic;
+using Core;
+using Quadratures;
+using Quasar.Native;
+
+namespace FEM
+{
+
+    public interface IFiniteElement
+    {
+        string Material { get; }
+        enum MatrixType { Stiffness, Mass }
+        int[] VertexNumber { get; } // в порядке левого обхода
+        void SetVertexDOF(int vertex, int dof);
+        int NumberOfEdges { get; }
+        (int i, int j) Edge(int edge);
+        int DOFOnEdge(int edge);
+
+        void SetEdgeDOF(int edge, int n, int dof);
+
+        // int[] GetDofsOnEdge(int edge); // возвращает степени свободы для всего ребра, включая геометрические вершины
+
+        int DOFOnElement();
+        void SetElementDOF(int n, int dof);
+        int[] Dofs { get; }
+        double[,] BuildLocalMatrix(Vector2D[] VertexCoords, MatrixType type, Func<Vector2D, double> Coeff); // у коэффициента первый параметр в локальных координатах элемента - зачем в локальных координатах?
+                                                                                                            // Как будем понимать, интегрируем или коэффициент раскладывается, если он не постоянный?
+
+        double[] BuildLocalRightPart(Vector2D[] VertexCoords, Func<Vector2D, double> F); // у коэффициента первый параметр в локальных координатах элемента  
+
+        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector2D[] VertexCoords, Func<Vector2D, double> Ug);
+        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector2D[] VertexCoords, Func<Vector2D, double> Theta);
+
+        bool IsPointOnElement(Vector2D[] VertexCoords, Vector2D point); // Проверяет, принадлежит ли точка конечному элементу
+        double GetValueAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить значение в точке на конечном элементе
+        Vector2D GetGradientAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить градиент в точке на конечном элементе
+    }
+    public interface IFiniteElementWithNumericIntegration<T1, T2> : IFiniteElement
+    {
+        IMasterElement<T1, T2> MasterElement { get; }
+    }
+
+    public interface IFiniteElementMesh
+    {
+        IEnumerable<IFiniteElement> Elements { get; }
+
+        Vector2D[] Vertex { get; } // без повторов
+        int NumberOfDofs { get; set; }
+    }
+    public interface IMasterElement<T1, T2, T3>
+    {
+        T2[,] PsiValues { get; }
+        double[,,] PsiPsiMatrix { get; }
+        T2[,] CurlValues { get; }
+        T3[,] GradValues {  get; }
+        QuadratureNodes<T1> QuadratureNodes { get; }
+    }
+    public interface ITimeMesh
+    {
+        double this[int i] { get; } // значение времени по индексу в массиве времени
+
+        int Size(); // количество временных слоев
+        double[] Coefs(int i); // массив коэф. для слоев, по идее содержит два слоя(предыдущий (j-1) и пред предыдущий (j-2)). // уточнить по поводу ReadOnlySpan
+                               // i будет принимать два значения - 1 и 2, для (j-1) и (j-2) соответственно. 
+
+        void ChangeCoefs(double[] coefs); // добавляем только что насчитанные коэф., заменяя (j-2) на (j-1), а (j-1) на (j)
+
+        //void AddFirstInitialCondition(double[] coefs);
+        //void AddSecondInitialCondition(double[] coefs); // Поскольку используем трехслойную схему, то нам требуется два начальных условия,
+        //                                                // а у нас только одно начальное условие
+        //                                                // Поэтому мы должны получить второе с помощью неявной двухслойной, и добавить к весам, 
+        //                                                // Чтобы дальше считать трехслойной
+        bool IsChangedStep(int i); // смотрим, поменялся ли шаг по времени
+
+        void DoubleMesh();
+    }
+
+    public interface IProblem
+    {
+        IDictionary<string, IMaterial> Materials { get; }
+        void Prepare();
+        void Solve(ISolution result);
+    }
+
+    public interface IMaterial
+    {
+        bool IsVolume { get; }
+        bool Is1 { get; }
+
+        bool Is2 { get; }
+
+        Func<Vector2D, double> Lambda { get; }
+        Func<Vector2D, double> Sigma { get; }
+
+        Func<Vector2D, double, double> Theta { get; }
+
+        Func<Vector2D, double, double> Ug { get; }
+
+        Func<Vector2D, double, double> F { get; }
+
+    }
+
+
+    public interface ISolution
+    {
+        double Time { get; set; } // Меняется вектор решения при установке определенного времени
+        IFiniteElementMesh Mesh { get; }
+        ITimeMesh TimeMesh { get; }
+        ReadOnlySpan<double> SolutionVector { get; }
+        void AddSolutionVector(double t, double[] solution);
+        double Value(Vector2D point);
+        Vector2D Gradient(Vector2D point);
+    }
+
+    public interface IMatrix
+    {
+        int N { get; }
+        void SetProfile(SortedSet<int>[] profile);
+        void AddLocal(int[] dofs, double[,] matrix, double coeff = 1d);
+        void Symmetrize(int dof, double value, double[] RightPart);
+        void Clear();
+    }
+
+    public interface ISLAE
+    {
+        IMatrix Matrix { get; }
+        void AddLocalRightPart(int[] dofs, double[] lrp);
+        void AddFirstBoundaryConditions(int[] dofs, double[] lrp);
+        void Clear();
+        void ClearRightPart();
+        double[] RightPart { get; }
+    }
+
+    public interface ISLAESolver : IDisposable
+    {
+        ISLAE SLAE { get; }
+        double[] Solve();
+    }
+}

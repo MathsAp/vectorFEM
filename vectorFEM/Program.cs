@@ -1,4 +1,5 @@
 ﻿using Core;
+using FEM;
 using Quadratures;
 using System.Runtime.CompilerServices;
 
@@ -35,6 +36,6 @@ for (int i = 0; i < n; ++i)
 
 result *= hx * hy * hz;
 
-Console.WriteLine($"Значение интеграла = {result} \n");
+Console.WriteLine($"Значение интеграла = {result} \n ");
 
 
