@@ -8,51 +8,58 @@ namespace FEM
 
     public interface IFiniteElement
     {
+        bool IsVector {  get; }
         string Material { get; }
         enum MatrixType { Stiffness, Mass }
-        int[] VertexNumber { get; } // в порядке левого обхода
+        int[] VertexNumber { get; } // в порядке локальной нумерации вершин 
         void SetVertexDOF(int vertex, int dof);
         int NumberOfEdges { get; }
+        int NumberOfFaces { get; }
         (int i, int j) Edge(int edge);
+        int[] Face(int face);
         int DOFOnEdge(int edge);
-
+        int DOFOnFace(int face);
         void SetEdgeDOF(int edge, int n, int dof);
-
-        // int[] GetDofsOnEdge(int edge); // возвращает степени свободы для всего ребра, включая геометрические вершины
+        void SetFaceDOF(int face, int n, int dof);
 
         int DOFOnElement();
         void SetElementDOF(int n, int dof);
         int[] Dofs { get; }
-        double[,] BuildLocalMatrix(Vector2D[] VertexCoords, MatrixType type, Func<Vector2D, double> Coeff); // у коэффициента первый параметр в локальных координатах элемента - зачем в локальных координатах?
+        double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, Func<Vector3D, double> Coeff); // у коэффициента первый параметр в локальных координатах элемента - зачем в локальных координатах?
                                                                                                             // Как будем понимать, интегрируем или коэффициент раскладывается, если он не постоянный?
 
-        double[] BuildLocalRightPart(Vector2D[] VertexCoords, Func<Vector2D, double> F); // у коэффициента первый параметр в локальных координатах элемента  
+        double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, double> F); // у коэффициента первый параметр в локальных координатах элемента  
+        double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> F);
+        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Ug);
+        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Ug);
+        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Theta);
+        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Theta);
 
-        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector2D[] VertexCoords, Func<Vector2D, double> Ug);
-        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector2D[] VertexCoords, Func<Vector2D, double> Theta);
-
-        bool IsPointOnElement(Vector2D[] VertexCoords, Vector2D point); // Проверяет, принадлежит ли точка конечному элементу
-        double GetValueAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить значение в точке на конечном элементе
-        Vector2D GetGradientAtPoint(Vector2D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector2D point); // Получить градиент в точке на конечном элементе
+        bool IsPointOnElement(Vector3D[] VertexCoords, Vector3D point); // Проверяет, принадлежит ли точка конечному элементу
+        double GetValueAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение в точке на конечном элементе 
+        Vector3D GetVectorAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение векторного поля в точке на конечном элементе
+        Vector3D GetGradientAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить градиент в точке на конечном элементе
+        Vector3D GetCurlAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение ротора векторного поля в точке на конечном элементе
     }
-    public interface IFiniteElementWithNumericIntegration<T1, T2, T3> : IFiniteElement
+    public interface IFiniteElementWithNumericIntegration<T1, T2> : IFiniteElement
     {
-        IMasterElement<T1, T2, T3> MasterElement { get; }
+        IMasterElement<T1, T2> MasterElement { get; }
     }
 
     public interface IFiniteElementMesh
     {
         IEnumerable<IFiniteElement> Elements { get; }
+        IDictionary<(int, int, int, int), (IFiniteElement?, IFiniteElement?)> FacePortrait { get; } // Как сделать универсальным
 
-        Vector2D[] Vertex { get; } // без повторов
+        Vector3D[] Vertex { get; } // без повторов
         int NumberOfDofs { get; set; }
     }
-    public interface IMasterElement<T1, T2, T3>
+    public interface IMasterElement<T1, T2>
     {
         T2[,] PsiValues { get; }
         double[,,] PsiPsiMatrix { get; }
         T2[,] CurlValues { get; }
-        T3[,] GradValues {  get; }
+        T1[,] GradValues {  get; }
         QuadratureNodes<T1> QuadratureNodes { get; }
     }
     public interface ITimeMesh
@@ -86,17 +93,19 @@ namespace FEM
     {
         bool IsVolume { get; }
         bool Is1 { get; }
-
         bool Is2 { get; }
 
-        Func<Vector2D, double> Lambda { get; }
-        Func<Vector2D, double> Sigma { get; }
+        Func<Vector3D, double> Lambda { get; }
+        Func<Vector3D, double> Sigma { get; }
+        Func<Vector3D, double> Epsilon { get; }
+        Func<Vector3D, double> Mu{ get; }
 
-        Func<Vector2D, double, double> Theta { get; }
-
-        Func<Vector2D, double, double> Ug { get; }
-
-        Func<Vector2D, double, double> F { get; }
+        Func<Vector3D, double, double> Theta { get; }
+        Func<Vector3D, double, Vector3D> Htheta { get; }
+        Func<Vector3D, double, double> Ug { get; }
+        Func<Vector3D, double, Vector3D> Ag { get; }
+        Func<Vector3D, double, double> F { get; }
+        Func<Vector3D, double, Vector3D> Fv { get; }
 
     }
 
@@ -108,8 +117,8 @@ namespace FEM
         ITimeMesh TimeMesh { get; }
         ReadOnlySpan<double> SolutionVector { get; }
         void AddSolutionVector(double t, double[] solution);
-        double Value(Vector2D point);
-        Vector2D Gradient(Vector2D point);
+        double Value(Vector3D point);
+        Vector3D Gradient(Vector3D point);
     }
 
     public interface IMatrix
