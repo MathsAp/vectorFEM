@@ -38,4 +38,12 @@ result *= hx * hy * hz;
 
 Console.WriteLine($"Значение интеграла = {result} \n ");
 
+Vector3D vec = Vector3D.Zero;
+
+var vec2 = new Vector3D(1, 2, 3);
+
+vec += vec2;
+
+Console.WriteLine($"Vec = {vec}, VecZero = {Vector3D.Zero}");
+
 

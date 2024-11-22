@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -267,7 +268,23 @@ namespace Core
 
                 public int[] Face(int face)
                 {
-                    throw new NotImplementedException();
+                    switch(face)
+                    {
+                        case 0:
+                            return [0, 2, 4, 6];
+                        case 1:
+                            return [1, 3, 5, 7];
+                        case 2:
+                            return [0, 1, 4, 5];
+                        case 3:
+                            return [2, 3, 6, 7];
+                        case 4:
+                            return [0, 1, 2, 3];
+                        case 5:
+                            return [4, 5, 6, 7];
+                        default:
+                            throw new ArgumentException();
+                    }
                 }
 
                 public int DOFOnFace(int face) => 0;
@@ -289,16 +306,74 @@ namespace Core
 
                 public bool IsPointOnElement(Vector3D[] VertexCoords, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    double x0 = VertexCoords[VertexNumber[0]].X;
+                    double x1 = VertexCoords[VertexNumber[1]].X;
+
+                    double y0 = VertexCoords[VertexNumber[0]].Y;
+                    double y1 = VertexCoords[VertexNumber[2]].Y;
+
+                    double z0 = VertexCoords[VertexNumber[0]].Z;
+                    double z1 = VertexCoords[VertexNumber[4]].Z;
+
+                    if (x0 <= point.X && point.X <= x1 
+                        && 
+                        y0 <= point.Y && point.Y <= y1 
+                        && 
+                        z0 <= point.Z && point.Z <= z1)
+                        return true;
+
+                    return false;
                 }
                 public Vector3D GetVectorAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    int N = Dofs.Length;
+
+                    double x0 = VertexCoords[VertexNumber[0]].X;
+                    double hx = VertexCoords[VertexNumber[1]].X - x0;
+
+                    double y0 = VertexCoords[VertexNumber[0]].Y;
+                    double hy = VertexCoords[VertexNumber[2]].Y - y0;
+
+                    double z0 = VertexCoords[VertexNumber[0]].Z;
+                    double hz = VertexCoords[VertexNumber[4]].Z - z0;
+
+                    double xi = (point.X - x0) / hx;
+                    double eta = (point.Y - y0) / hy;
+                    double zeta = (point.Z - z0) / hz;
+
+                    Vector3D vec = Vector3D.Zero;
+
+                    for (int i = 0; i < N; ++i)
+                        vec += coeffs[Dofs[i]] * LinearVectorBasis.Phi[i](xi, eta, zeta);
+
+                    return vec;
                 }
 
                 public Vector3D GetCurlAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    int N = Dofs.Length;
+
+                    double x0 = VertexCoords[VertexNumber[0]].X;
+                    double hx = VertexCoords[VertexNumber[1]].X - x0;
+
+                    double y0 = VertexCoords[VertexNumber[0]].Y;
+                    double hy = VertexCoords[VertexNumber[2]].Y - y0;
+
+                    double z0 = VertexCoords[VertexNumber[0]].Z;
+                    double hz = VertexCoords[VertexNumber[4]].Z - z0;
+
+                    double xi = (point.X - x0) / hx;
+                    double eta = (point.Y - y0) / hy;
+                    double zeta = (point.Z - z0) / hz;
+
+                    Vector3D curl = Vector3D.Zero;
+
+                    for (int i = 0; i < N; ++i)
+                    {
+                        curl += coeffs[Dofs[i]] * LinearVectorBasis.curlPhi[i](xi, eta, zeta);
+                    }
+
+                    return curl;
                 }
             }
         }
