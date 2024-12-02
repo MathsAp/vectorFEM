@@ -24,6 +24,12 @@ namespace FEM
 
         public QuadratureNodes<Vector3D> QuadratureNodes {  get; }
 
+        public Vector3D[,,] FacesPsiValues => throw new NotImplementedException();
+
+        public Vector3D[,,] FacesPsiNValues => throw new NotImplementedException();
+
+        public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
         private CubeMasterElementLinearVectorBasis()
         {
             int order = 5;
@@ -57,6 +63,12 @@ namespace FEM
 
         public QuadratureNodes<Vector3D> QuadratureNodes { get; }
 
+        public double[,,] FacesPsiValues => throw new NotImplementedException();
+
+        public double[,,] FacesPsiNValues => throw new NotImplementedException();
+
+        public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
         private CubeMasterElementLinearScalarBasis()
         {
             int n = 8;
@@ -77,6 +89,46 @@ namespace FEM
         }
     }
 
+    public class SquareMasterElementLinearVectorBasis : IMasterElement<Vector2D, Vector3D>
+    {
+        private static SquareMasterElementLinearVectorBasis? Instance;
+        public Vector3D[,] PsiValues => throw new NotImplementedException();
+
+        public Vector3D[,,] FacesPsiValues { get; }
+        
+        public Vector3D[,,] FacesPsiNValues {  get; }
+
+        public double[,,] PsiPsiMatrix => throw new NotImplementedException();
+
+        public double[,,,] FacesPsiNPsiNMatrix {  get; }
+
+        public Vector3D[,] CurlValues => throw new NotImplementedException();
+
+        public Vector2D[,] GradValues => throw new NotImplementedException();
+
+        public QuadratureNodes<Vector2D> QuadratureNodes { get; }
+
+        private SquareMasterElementLinearVectorBasis()
+        {
+            int n = 4;
+            int order = 5;
+
+            QuadratureNodes = NumericalIntegration.FactoryQuadratures2D(order, ElemType.Rectangle);
+            FacesPsiValues = MasterElementAlgorithms.CalcVectorFacesPsiValues(n, QuadratureNodes);
+            FacesPsiNValues = MasterElementAlgorithms.CalcVectorFacesPsiNValues(n, QuadratureNodes);
+            FacesPsiNPsiNMatrix = MasterElementAlgorithms.CalcVectorFacesPsiNPsiNMatrix(n, QuadratureNodes, FacesPsiNValues);
+        }
+
+        public static SquareMasterElementLinearVectorBasis GetInstance()
+        {
+            if (Instance == null)
+                Instance = new SquareMasterElementLinearVectorBasis();
+
+            return Instance;
+        }
+
+    }
+
     public class SquareMasterElementLinearScalarBasis : IMasterElement<Vector2D, double>
     {
         private static SquareMasterElementLinearScalarBasis? Instance;
@@ -90,6 +142,12 @@ namespace FEM
         public Vector2D[,] GradValues { get; }
 
         public QuadratureNodes<Vector2D> QuadratureNodes { get; }
+
+        public double[,,] FacesPsiValues => throw new NotImplementedException();
+
+        public double[,,] FacesPsiNValues => throw new NotImplementedException();
+
+        public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
 
         private SquareMasterElementLinearScalarBasis()
         {

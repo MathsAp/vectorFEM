@@ -31,9 +31,9 @@ namespace FEM
         double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, double> F); // у коэффициента первый параметр в локальных координатах элемента  
         double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> F);
         double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Ug);
-        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Ug);
+        double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Ug);
         double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Theta);
-        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Theta);
+        double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Theta);
 
         bool IsPointOnElement(Vector3D[] VertexCoords, Vector3D point); // Проверяет, принадлежит ли точка конечному элементу
         double GetValueAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение в точке на конечном элементе 
@@ -49,7 +49,7 @@ namespace FEM
     public interface IFiniteElementMesh
     {
         IEnumerable<IFiniteElement> Elements { get; }
-        IDictionary<(int, int, int, int), (IFiniteElement?, IFiniteElement?)> FacePortrait { get; } // Как сделать универсальным
+        IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait { get; } // Как сделать универсальным
 
         Vector3D[] Vertex { get; } // без повторов
         int NumberOfDofs { get; set; }
@@ -57,7 +57,10 @@ namespace FEM
     public interface IMasterElement<T1, T2>
     {
         T2[,] PsiValues { get; }
+        T2[,,] FacesPsiValues { get; }
+        T2[,,] FacesPsiNValues { get; }
         double[,,] PsiPsiMatrix { get; }
+        double[,,,] FacesPsiNPsiNMatrix { get; }
         T2[,] CurlValues { get; }
         T1[,] GradValues {  get; }
         QuadratureNodes<T1> QuadratureNodes { get; }

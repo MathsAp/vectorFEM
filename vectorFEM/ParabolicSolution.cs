@@ -7,9 +7,9 @@ using FEM;
 
 namespace Core
 {
-    public class Solution : ISolution
+    public class ParabolicSolution : ISolution
     {
-        public Solution(IFiniteElementMesh mesh, ITimeMesh timeMesh, string _path = "")
+        public ParabolicSolution(IFiniteElementMesh mesh, ITimeMesh timeMesh, string _path = "")
         {
             Mesh = mesh;
             TimeMesh = timeMesh;
@@ -75,6 +75,22 @@ namespace Core
             return 0; // что возвращать, если не попала ни в один элемент?
         }
 
+        public Vector3D Vector(Vector3D point)
+        {
+            foreach (var element in Mesh.Elements)
+            {
+                if (element.VertexNumber.Length != 2)
+                {
+                    if (element.IsPointOnElement(Mesh.Vertex, point))
+                    {
+                        return element.GetVectorAtPoint(Mesh.Vertex, solutionVector, point);
+                    }
+                }
+            }
+
+            return Vector3D.Zero;
+        }
+
         public Vector3D Gradient(Vector3D point)
         {
             foreach (var element in Mesh.Elements)
@@ -88,7 +104,23 @@ namespace Core
                 }
             }
 
-            return new Vector3D(0, 0, 0);
+            return Vector3D.Zero;
+        }
+
+        public Vector3D Curl(Vector3D point)
+        {
+            foreach (var element in Mesh.Elements)
+            {
+                if (element.VertexNumber.Length != 2)
+                {
+                    if (element.IsPointOnElement(Mesh.Vertex, point))
+                    {
+                        return element.GetCurlAtPoint(Mesh.Vertex, solutionVector, point);
+                    }
+                }
+            }
+
+            return Vector3D.Zero;
         }
 
         public void AddSolutionVector(double t, double[] solution)

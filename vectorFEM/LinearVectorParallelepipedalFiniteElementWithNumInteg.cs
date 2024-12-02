@@ -158,7 +158,7 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Ug)
+                public double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Ug)
                 {
                     throw new NotImplementedException();
                 }
@@ -168,7 +168,7 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> Theta)
+                public double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Theta)
                 {
                     throw new NotImplementedException();
                 }
@@ -287,6 +287,27 @@ namespace Core
                     }
                 }
 
+                static public int[] FaceS(int face)
+                {
+                    switch (face)
+                    {
+                        case 0:
+                            return [0, 2, 4, 6];
+                        case 1:
+                            return [1, 3, 5, 7];
+                        case 2:
+                            return [0, 1, 4, 5];
+                        case 3:
+                            return [2, 3, 6, 7];
+                        case 4:
+                            return [0, 1, 2, 3];
+                        case 5:
+                            return [4, 5, 6, 7];
+                        default:
+                            throw new ArgumentException();
+                    }
+                }
+
                 public int DOFOnFace(int face) => 0;
 
                 public void SetFaceDOF(int face, int n, int dof)
@@ -344,7 +365,7 @@ namespace Core
                     Vector3D vec = Vector3D.Zero;
 
                     for (int i = 0; i < N; ++i)
-                        vec += coeffs[Dofs[i]] * LinearVectorBasis.Phi[i](xi, eta, zeta);
+                        vec += coeffs[Dofs[i]] * Linear3DVectorBasis.Phi[i](xi, eta, zeta);
 
                     return vec;
                 }
@@ -370,10 +391,63 @@ namespace Core
 
                     for (int i = 0; i < N; ++i)
                     {
-                        curl += coeffs[Dofs[i]] * LinearVectorBasis.curlPhi[i](xi, eta, zeta);
+                        var curli = Linear3DVectorBasis.curlPhi[i](xi, eta, zeta);
+
+                        if (curli.X == 0d)
+                            curli = new Vector3D(curli.X, curli.Y / hz, curli.Z / hy);
+                        else if (curli.Y == 0d)
+                            curli = new Vector3D(curli.X / hz, curli.Y, curli.Z / hx);
+                        else if (curli.Z == 0d)
+                            curli = new Vector3D(curli.X / hy, curli.Y / hx, curli.Z);
+
+                        curl += coeffs[Dofs[i]] * curli;
                     }
 
                     return curl;
+                }
+
+                public static Vector3D GetNormal(int face)
+                {
+                    switch (face)
+                    {
+                        case 0:
+                            return -Vector3D.XAxis;
+                        case 1:
+                            return Vector3D.XAxis;
+                        case 2:
+                            return -Vector3D.YAxis;
+                        case 3:
+                            return Vector3D.YAxis;
+                        case 4:
+                            return -Vector3D.ZAxis;
+                        case 5:
+                            return Vector3D.ZAxis;
+                        default:
+                            throw new ArgumentException();
+                    }
+
+                }
+
+                public static int[] LocalEdgesDofsAtFace(int face)
+                {
+                    switch(face)
+                    {
+                        case 0:
+                            return [4, 6, 8, 10];
+                        case 1:
+                            return [5, 7, 9, 11];
+                        case 2:
+                            return [0, 2, 8, 9];
+                        case 3:
+                            return [1, 3, 10, 11];
+                        case 4:
+                            return [0, 1, 4, 5];
+                        case 5:
+                            return [2, 3, 6, 7];
+
+                        default:
+                            throw new ArgumentException();
+                    }
                 }
             }
         }

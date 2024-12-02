@@ -23,7 +23,7 @@ namespace Core
 
         public int NumberOfDofs { get; set; }
 
-        public IDictionary<(int, int, int, int), (IFiniteElement?, IFiniteElement?)> FacePortrait { get; }
+        public IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait { get; }
 
     }
 }

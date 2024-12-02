@@ -27,30 +27,31 @@ namespace FEM
             return dict;
         }
 
-        public static Dictionary<(int, int, int, int), (IFiniteElement?, IFiniteElement?)> BuildFacePortrait(IFiniteElementMesh mesh)
+        public static Dictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> BuildFacePortrait(IFiniteElementMesh mesh)
         {
-            var dict = new Dictionary<(int, int, int, int), (IFiniteElement?, IFiniteElement?)>();
+            var dict = new Dictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))>();
 
 
             foreach(var element in mesh.Elements)
             {
-                for (int i = 0; i < element.NumberOfFaces; ++i)
-                {
-                    var face = element.Face(i);
+                if (element.VertexNumber.Length > 4)
+                    for (int i = 0; i < element.NumberOfFaces; ++i)
+                    {
+                        var face = element.Face(i);
 
-                    face[0] = element.VertexNumber[face[0]];
-                    face[1] = element.VertexNumber[face[1]];
-                    face[2] = element.VertexNumber[face[2]];
-                    face[3] = element.VertexNumber[face[3]];
+                        face[0] = element.VertexNumber[face[0]];
+                        face[1] = element.VertexNumber[face[1]];
+                        face[2] = element.VertexNumber[face[2]];
+                        face[3] = element.VertexNumber[face[3]];
 
-                    Array.Sort(face);
+                        Array.Sort(face);
 
-                    var faceTuple = (face[0], face[1], face[2], face[3]);
+                        var faceTuple = (face[0], face[1], face[2], face[3]);
 
-                    if (!dict.TryGetValue(faceTuple, out (IFiniteElement?, IFiniteElement?) value)) dict[faceTuple] = (element, null);
-                    else dict[faceTuple] = (dict[faceTuple].Item1, element);
+                        if (!dict.TryGetValue(faceTuple, out ((IFiniteElement?, int), (IFiniteElement?, int)) value)) dict[faceTuple] = ((element, i), (null, -1));
+                        else dict[faceTuple] = (dict[faceTuple].Item1, (element, i));
                     
-                }
+                    }
             }    
 
             return dict;
