@@ -10,7 +10,7 @@ namespace Core
 {
     public class PardisoSLAE : ISLAE
     {
-        public PardisoSLAE(PardisoMatrix matrix)
+        public PardisoSLAE(IMatrix matrix)
         {
             Matrix = matrix;
 

@@ -32,6 +32,7 @@ namespace Core
         {
             FemAlgorithms.EnumerateMeshDofs(Mesh);
             SLAE = new(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+            //SLAE = new(new PardisoNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.StructurallySymmetric));
             TimeMesh.ChangeCoefs(GetWeightsForInitialCondition());
         }
 
@@ -98,8 +99,8 @@ namespace Core
                     timeCoeffs[1] = 1 / deltaT0;
                 }
 
-                foreach (var element in Mesh.Elements)
-                 //   Parallel.ForEach(Mesh.Elements, element =>
+                //foreach (var element in Mesh.Elements)
+                Parallel.ForEach(Mesh.Elements, element =>
                 {
                     var material = Materials[element.Material];
 
@@ -128,7 +129,7 @@ namespace Core
                         SLAE?.AddLocalRightPart(element.Dofs, LRP);
                     }
                 }
-                //);
+                );
 
                 foreach(var element in Mesh.Elements)
                 {
