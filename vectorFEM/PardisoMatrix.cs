@@ -35,14 +35,14 @@ namespace Core
         PardisoMatrixType type;
         PardisoMatrixType IPardisoMatrix<double>.MatrixType => type;
 
-        public void AddLocal(int[] dofs, double[,] matrix, double coeff = 1d)
+        public void AddLocal(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d)
         {
-            for (int i = 0; i < dofs.Length; ++i)
+            for (int i = 0; i < dofsi.Length; ++i)
             {
-                for (int j = i; j < dofs.Length; ++j)
+                for (int j = i; j < dofsi.Length; ++j)
                 {
-                    int di = dofs[i];
-                    int dj = dofs[j];
+                    int di = dofsi[i];
+                    int dj = dofsi[j];
 
                     if (di <= dj)
                     {
@@ -64,6 +64,11 @@ namespace Core
                     }
                 }
             }
+        }
+
+        public void AddLocalTransposed(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d)
+        {
+            throw new NotImplementedException();
         }
 
         public void Symmetrize(int dof, double value, double[] RightPart)

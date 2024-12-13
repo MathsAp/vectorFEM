@@ -20,7 +20,7 @@ namespace FEM
                     var edge = element.Edge(i);
                     edge = (element.VertexNumber[edge.i], element.VertexNumber[edge.j]);
                     if (edge.i < edge.j) edge = (edge.j, edge.i);
-                    var n = element.DOFOnEdge(i);
+                    var n = element.DOFOnEdge(i, element.Type);
                     if (!dict.TryGetValue(edge, out int c) || c > n) dict[edge] = n;
                 }
             }
@@ -85,10 +85,10 @@ namespace FEM
                     var edge = element.Edge(i);
                     edge = (element.VertexNumber[edge.i], element.VertexNumber[edge.j]);
                     if (edge.i < edge.j) edge = (edge.j, edge.i);
-                    var n = element.DOFOnEdge(i);
+                    var n = element.DOFOnEdge(i, element.Type);
                     var start = edges[edge] - n;
                     for (int j = 0; j < n; j++)
-                        element.SetEdgeDOF(i, j, start + j);
+                        element.SetEdgeDOF(i, j, start + j, element.Type);
                 }
             }
 
@@ -117,7 +117,7 @@ namespace FEM
 
             foreach(var element in mesh.Elements)
             {
-                if (!element.IsVector)
+                if (element.Type != IFiniteElement.ElementType.Vector)
                 {
                     set.UnionWith(element.VertexNumber);
                 }

@@ -36,10 +36,10 @@ namespace Core
                 if (material.IsVolume)
                 {
                     var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, material.Lambda);
-                    SLAE?.Matrix.AddLocal(element.Dofs, LM);
+                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
 
                     LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
-                    SLAE?.Matrix.AddLocal(element.Dofs, LM);
+                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
 
                     var LRP = element.BuildLocalRightPart(Mesh.Vertex, Coeff => material.F(Coeff, 1));
                     SLAE?.AddLocalRightPart(element.Dofs, LRP);

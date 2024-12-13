@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static FEM.IFiniteElement;
 
 namespace Core
 {
@@ -12,7 +13,7 @@ namespace Core
     {
         namespace FiniteElements3D
         {
-            public class LinearVectorParallelepipedalFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector3D, Vector3D>
+            public class LinearVectorParallelepipedalFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector3D, Vector3D, Vector3D>
             {
                 public LinearVectorParallelepipedalFiniteElementWithNumInteg(string material, int[] vertexNumber)
                 {
@@ -21,7 +22,7 @@ namespace Core
                     MasterElement = CubeMasterElementLinearVectorBasis.GetInstance();
                 }
 
-                public IMasterElement<Vector3D, Vector3D> MasterElement { get; }
+                public IMasterElement<Vector3D, Vector3D, Vector3D> MasterElement { get; }
 
                 public string Material { get; }
 
@@ -34,6 +35,8 @@ namespace Core
                 public bool IsVector => true;
 
                 public int NumberOfFaces => 6;
+
+                public ElementType Type => ElementType.Vector;
 
                 public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff)
                 {
@@ -173,7 +176,7 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public int DOFOnEdge(int edge) => 1;
+                public int DOFOnEdge(int edge, ElementType type) => 1;
 
                 public int DOFOnElement() => 0;
 
@@ -211,7 +214,7 @@ namespace Core
                     }
                 }
 
-                public void SetEdgeDOF(int edge, int n, int dof)
+                public void SetEdgeDOF(int edge, int n, int dof, ElementType type)
                 {
                     switch(edge)
                     {
@@ -308,9 +311,9 @@ namespace Core
                     }
                 }
 
-                public int DOFOnFace(int face) => 0;
+                public int DOFOnFace(int face, ElementType type) => 0;
 
-                public void SetFaceDOF(int face, int n, int dof)
+                public void SetFaceDOF(int face, int n, int dof, ElementType type)
                 {
                     throw new NotImplementedException();
                 }
@@ -448,6 +451,16 @@ namespace Core
                         default:
                             throw new ArgumentException();
                     }
+                }
+
+                public int[] GetDofs(DofsType type)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff)
+                {
+                    throw new NotImplementedException();
                 }
             }
         }

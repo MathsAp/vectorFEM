@@ -317,5 +317,50 @@ namespace FEM
             return gradValues;
         }
 
+        public static Vector3D[,,] CalcFacesGradValues(int n, QuadratureNodes<Vector2D> quadratureNodes)
+        {
+            Vector3D[,,] gradValues = new Vector3D[6, n, quadratureNodes.Nodes.Length];
+
+            Vector3D[] CubeVertex = [new Vector3D(0, 0, 0), new Vector3D(1, 0, 0), new Vector3D(0, 1, 0), new Vector3D(1, 1, 0),
+                                     new Vector3D(0, 0, 1), new Vector3D(1, 0, 1), new Vector3D(0, 1, 1), new Vector3D(1, 1, 1)];
+
+            int Mu(int i) => LinearParallelepipedalFiniteElementWithNumInteg.Mu(i);
+            int Nu(int i) => LinearParallelepipedalFiniteElementWithNumInteg.Nu(i);
+            int Upsilon(int i) => LinearParallelepipedalFiniteElementWithNumInteg.Upsilon(i);
+
+            for (int f = 0; f < 6; ++f)
+            {
+                var face = LinearVectorParallelepipedalFiniteElementWithNumInteg.FaceS(f);
+
+                Vector3D a = CubeVertex[face[0]];
+                Vector3D b = CubeVertex[face[1]];
+                Vector3D c = CubeVertex[face[2]];
+                Vector3D d = CubeVertex[face[3]];
+
+                var nodes = quadratureNodes.Nodes;
+
+                for (int i = 0; i < n; ++i)
+                {
+                    int ind = face[i];
+
+                    for (int j = 0; j < nodes.Length; ++j)
+                    {
+                        var node = nodes[j].Node;
+
+                        var newNode = a * (1 - node.X) * (1 - node.Y) + b * node.X * (1 - node.Y) +
+                                      c * (1 - node.X) * node.Y       + d * node.X * node.Y;
+
+
+                        gradValues[f, i, j] = new Vector3D(LinearBasisDerivatives.Phi[Mu(ind)](newNode.X) * LinearBasis.Phi[Nu(ind)](newNode.Y) * LinearBasis.Phi[Upsilon(ind)](newNode.Z),
+                                                           LinearBasis.Phi[Mu(ind)](newNode.X) * LinearBasisDerivatives.Phi[Nu(ind)](newNode.Y) * LinearBasis.Phi[Upsilon(ind)](newNode.Z),
+                                                           LinearBasis.Phi[Mu(ind)](newNode.X) * LinearBasis.Phi[Nu(ind)](newNode.Y) * LinearBasisDerivatives.Phi[Upsilon(ind)](newNode.Z));
+                    }
+                }
+            }
+
+            return gradValues;
+        }
     }
+
+   
 }

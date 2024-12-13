@@ -45,7 +45,7 @@ namespace Core
                 {
 
                     var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, _ => 1);
-                    SLAE?.Matrix.AddLocal(element.Dofs, LM);
+                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
 
                     var LRP = element.BuildLocalRightPart(Mesh.Vertex, InitialCondition);
                     SLAE?.AddLocalRightPart(element.Dofs, LRP);
@@ -113,7 +113,7 @@ namespace Core
                     {
 
                         var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, material.Lambda);
-                        SLAE?.Matrix.AddLocal(element.Dofs, LM);
+                        SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
 
                         LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
 
@@ -122,7 +122,7 @@ namespace Core
 
 
                         double[] LC = new double[element.Dofs.Length];
-                        SLAE?.Matrix.AddLocal(element.Dofs, LM, timeCoefs[0]);
+                        SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM, timeCoefs[0]);
                         for (int i = 1; i < scheme; ++i)
                         {
                             LRP = LinearAlgebraAlgorithms.MultiplyMatrixVector(LM, GetLocalCoeffs(LC, element.Dofs, TimeMesh.Coefs(i)), timeCoefs[i]);

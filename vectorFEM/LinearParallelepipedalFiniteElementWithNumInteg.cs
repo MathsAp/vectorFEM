@@ -1,10 +1,12 @@
 ﻿using FEM;
+using Quadratures;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static FEM.IFiniteElement;
 
 namespace Core
 {
@@ -12,7 +14,7 @@ namespace Core
     {
         namespace FiniteElements3D
         {
-            public class LinearParallelepipedalFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector3D, double>
+            public class LinearParallelepipedalFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector3D, double, double>
             {
                 public LinearParallelepipedalFiniteElementWithNumInteg(string material, int[] vertexNumber)
                 {
@@ -21,7 +23,8 @@ namespace Core
                     MasterElement = CubeMasterElementLinearScalarBasis.GetInstance();
                 }
 
-                public IMasterElement<Vector3D, double> MasterElement { get; }
+                public ElementType Type => ElementType.Scalar;
+                public IMasterElement<Vector3D, double, double> MasterElement { get; }
 
                 public string Material { get; }
 
@@ -159,7 +162,7 @@ namespace Core
                 public static int Nu(int i) => (i / 2) % 2;
                 public static int Upsilon(int i) => i / 4;
 
-                public int DOFOnEdge(int edge) => 0;
+                public int DOFOnEdge(int edge, ElementType type) => 0;
 
                 public int DOFOnElement() => 0;
 
@@ -278,7 +281,7 @@ namespace Core
                     return false;
                 }
 
-                public void SetEdgeDOF(int edge, int n, int dof)
+                public void SetEdgeDOF(int edge, int n, int dof, ElementType type)
                 {
                     throw new NotImplementedException();
                 }
@@ -343,9 +346,9 @@ namespace Core
                     }
                 }
 
-                public int DOFOnFace(int face) => 0;
+                public int DOFOnFace(int face, ElementType type) => 0;
 
-                public void SetFaceDOF(int face, int n, int dof)
+                public void SetFaceDOF(int face, int n, int dof, ElementType type)
                 {
                     throw new NotImplementedException();
                 }
@@ -385,6 +388,16 @@ namespace Core
                     }
 
                     return values;
+                }
+
+                public int[] GetDofs(DofsType type)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff)
+                {
+                    throw new NotImplementedException();
                 }
             }
         }

@@ -7,6 +7,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static FEM.IFiniteElement;
 
 namespace Core
 {
@@ -14,7 +15,7 @@ namespace Core
     {
         namespace FiniteElements2D
         {
-            public class LinearVectorRectangularFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector2D, Vector3D>
+            public class LinearVectorRectangularFiniteElementWithNumInteg : IFiniteElementWithNumericIntegration<Vector2D, Vector3D, Vector3D>
             {
 
                 public LinearVectorRectangularFiniteElementWithNumInteg(string material, int[] vertexNumber)
@@ -24,7 +25,7 @@ namespace Core
                     MasterElement = SquareMasterElementLinearVectorBasis.GetInstance();
                 }
 
-                public IMasterElement<Vector2D, Vector3D> MasterElement { get; }
+                public IMasterElement<Vector2D, Vector3D, Vector3D> MasterElement { get; }
 
                 public bool IsVector => true;
 
@@ -37,6 +38,8 @@ namespace Core
                 public int NumberOfFaces => 1;
 
                 public int[] Dofs { get; } = new int[4];
+
+                public ElementType Type => ElementType.Vector;
 
                 public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff)
                 {
@@ -95,6 +98,8 @@ namespace Core
                         }
                     }
 
+                    var localUgInNodes = CalcLocalFuncInQuadratureNodes(LocalUg, n, nodes);
+
                     for (int i = 0; i < N; ++i)
                     {
                         double sum = 0;
@@ -102,7 +107,7 @@ namespace Core
                         for (int k = 0; k < nodes.Length; ++k)
                         {
                             var node = nodes[k];
-                            sum += node.Weight * MasterElement.FacesPsiNValues[face, i, k] * Vector3D.Cross(LocalUg(node.Node), n);
+                            sum += node.Weight * MasterElement.FacesPsiNValues[face, i, k] * localUgInNodes[k];
                         }
 
                         LRP[i] = sum * S;
@@ -111,7 +116,7 @@ namespace Core
                     var localDofs = BuildLocalDofsForLocalMatrix(N);
 
                     var SLAE = new PardisoSLAE(new PardisoMatrix(BuildProfileForLocalMatrix(N), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
-                    SLAE.Matrix.AddLocal(localDofs, M);
+                    SLAE.Matrix.AddLocal(localDofs, localDofs, M);
                     SLAE.AddLocalRightPart(localDofs, LRP);
 
                     using (PardisoSLAESolver SLAESolver = new PardisoSLAESolver(SLAE))
@@ -152,13 +157,15 @@ namespace Core
 
                     var nodes = MasterElement.QuadratureNodes.Nodes;
 
-                    for(int i = 0; i < N; ++i)
+                    var localThetaInNodes = CalcLocalFuncInQuadratureNodes(LocalTheta, n, nodes);
+
+                    for (int i = 0; i < N; ++i)
                     {
                         double sum = 0;
                         for (int k = 0; k < nodes.Length; ++k)
                         {
                             var node = nodes[k].Node;
-                            sum += nodes[k].Weight * MasterElement.FacesPsiValues[face, i, k] * Vector3D.Cross(LocalTheta(node), n); // Функцию в узлах на конечном элементе можно насчитать один раз
+                            sum += nodes[k].Weight * MasterElement.FacesPsiValues[face, i, k] * localThetaInNodes[k]; // Функцию в узлах на конечном элементе можно насчитать один раз
                         }
 
                         LRP[i] = sum * S;
@@ -213,11 +220,11 @@ namespace Core
                     return LRP;
                 }
 
-                public int DOFOnEdge(int edge) => 1;
+                public int DOFOnEdge(int edge, ElementType type) => 1;
 
                 public int DOFOnElement() => 0;
 
-                public int DOFOnFace(int face) => 0;
+                public int DOFOnFace(int face, ElementType type) => 0;
 
                 public (int i, int j) Edge(int edge)
                 {
@@ -236,7 +243,7 @@ namespace Core
                     }
                 }
 
-                public void SetEdgeDOF(int edge, int n, int dof)
+                public void SetEdgeDOF(int edge, int n, int dof, ElementType type)
                 {
                     switch (edge)
                     {
@@ -262,7 +269,7 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public void SetFaceDOF(int face, int n, int dof)
+                public void SetFaceDOF(int face, int n, int dof, ElementType type)
                 {
                     throw new NotImplementedException();
                 }
@@ -333,6 +340,28 @@ namespace Core
                         localDofs[i] = i;
 
                     return localDofs;
+                }
+
+                public int[] GetDofs(DofsType type)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff)
+                {
+                    throw new NotImplementedException();
+                }
+
+                Vector3D[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, Vector3D> LocalFunc, Vector3D n, Quadratures.QuadratureNode<Vector2D>[] nodes)
+                {
+                    Vector3D[] values = new Vector3D[nodes.Length];
+
+                    for (int k = 0; k < nodes.Length; ++k)
+                    {
+                        values[k] = Vector3D.Cross(LocalFunc(nodes[k].Node), n);
+                    }
+
+                    return values;
                 }
             }
         }

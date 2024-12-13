@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FEM
 {
-    public class CubeMasterElementLinearVectorBasis : IMasterElement<Vector3D, Vector3D>
+    public class CubeMasterElementLinearVectorBasis : IMasterElement<Vector3D, Vector3D, Vector3D>
     {
         private static CubeMasterElementLinearVectorBasis? Instance;
 
@@ -29,6 +29,8 @@ namespace FEM
         public Vector3D[,,] FacesPsiNValues => throw new NotImplementedException();
 
         public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
+        public Vector3D[,,] FacesGradValues => throw new NotImplementedException();
 
         private CubeMasterElementLinearVectorBasis()
         {
@@ -50,7 +52,7 @@ namespace FEM
         }
     }
 
-    public class CubeMasterElementLinearScalarBasis : IMasterElement<Vector3D, double>
+    public class CubeMasterElementLinearScalarBasis : IMasterElement<Vector3D, double, double>
     {
         private static CubeMasterElementLinearScalarBasis? Instance;
         public double[,] PsiValues { get; }
@@ -68,6 +70,8 @@ namespace FEM
         public double[,,] FacesPsiNValues => throw new NotImplementedException();
 
         public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
+        public double[,,] FacesGradValues => throw new NotImplementedException();
 
         private CubeMasterElementLinearScalarBasis()
         {
@@ -89,7 +93,7 @@ namespace FEM
         }
     }
 
-    public class SquareMasterElementLinearVectorBasis : IMasterElement<Vector2D, Vector3D>
+    public class SquareMasterElementLinearVectorBasis : IMasterElement<Vector2D, Vector3D, Vector3D>
     {
         private static SquareMasterElementLinearVectorBasis? Instance;
         public Vector3D[,] PsiValues => throw new NotImplementedException();
@@ -107,6 +111,8 @@ namespace FEM
         public Vector2D[,] GradValues => throw new NotImplementedException();
 
         public QuadratureNodes<Vector2D> QuadratureNodes { get; }
+
+        public Vector3D[,,] FacesGradValues => throw new NotImplementedException();
 
         private SquareMasterElementLinearVectorBasis()
         {
@@ -129,7 +135,7 @@ namespace FEM
 
     }
 
-    public class SquareMasterElementLinearScalarBasis : IMasterElement<Vector2D, double>
+    public class SquareMasterElementLinearScalarBasis : IMasterElement<Vector2D, double, Vector3D>
     {
         private static SquareMasterElementLinearScalarBasis? Instance;
 
@@ -149,6 +155,8 @@ namespace FEM
 
         public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
 
+        public Vector3D[,,] FacesGradValues { get; }
+
         private SquareMasterElementLinearScalarBasis()
         {
             int n = 4;
@@ -158,6 +166,7 @@ namespace FEM
             PsiValues = MasterElementAlgorithms.CalcScalarPsiValues(n, QuadratureNodes);
             PsiPsiMatrix = MasterElementAlgorithms.CalcScalarPsiPsiMatrix(n, QuadratureNodes, PsiValues);
             GradValues = MasterElementAlgorithms.CalcGradValues(n, QuadratureNodes);
+            FacesGradValues = MasterElementAlgorithms.CalcFacesGradValues(n, QuadratureNodes);
         }
 
         public static SquareMasterElementLinearScalarBasis GetInstance()

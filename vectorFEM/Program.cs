@@ -235,13 +235,13 @@ FiniteElementMesh mesh = new(elements, vertex);
 
 Dictionary<string, IMaterial> Materials = new()
 {
-    { "volume", new Material(true, false, false, x => 0, x => 4, x => 0, x => 5, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D(4 * (x.Y * x.Z + x.Y + x.Z + 5), 4 * (x.X * x.Z + x.X + x.Z + 8), 4 * (x.X * x.Y + x.X + x.Y + 11))) },
-    { "1", new Material(false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "2", new Material(false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "3", new Material(false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "4", new Material(false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y + 5) * t, (x.X + 8) * t, (x.X * x.Y + x.X + x.Y + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "5", new Material(false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Z + 5) * t, (x.X * x.Z + x.X + x.Z + 8) * t, (x.X + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "6", new Material(false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5) * t, (7 * x.Z + 14) * t, (7 * x.Y + 17) * t), (x, t) => 0, (x, t) => Vector3D.Zero) }
+    { "volume", new Material(true, false, false, false, x => 0, x => 4, x => 0, x => 5, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D(4 * (x.Y * x.Z + x.Y + x.Z + 5), 4 * (x.X * x.Z + x.X + x.Z + 8), 4 * (x.X * x.Y + x.X + x.Y + 11))) },
+    { "1", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "3", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "4", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y + 5) * t, (x.X + 8) * t, (x.X * x.Y + x.X + x.Y + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "5", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Z + 5) * t, (x.X * x.Z + x.X + x.Z + 8) * t, (x.X + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "6", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5) * t, (7 * x.Z + 14) * t, (7 * x.Y + 17) * t), (x, t) => 0, (x, t) => Vector3D.Zero) }
 };
 
 double[] t = [0, 2, 4, 6, 8, 10];
@@ -329,3 +329,13 @@ while (flag)
 
     flag = bool.Parse(Console.ReadLine()!);
 }
+
+IMasterElement<Vector2D, double, Vector3D> ME = SquareMasterElementLinearScalarBasis.GetInstance();
+
+int[] test = [1, 2, 3, 4, 5, 6, 7, 8];
+
+Console.WriteLine(string.Join(", ", test[..4]));
+Console.WriteLine(string.Join(", ", test[4..]));
+
+
+Console.WriteLine("Хотите продолжить?");

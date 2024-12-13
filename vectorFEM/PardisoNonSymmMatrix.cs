@@ -32,14 +32,14 @@ namespace Core
         PardisoMatrixType type;
         PardisoMatrixType IPardisoMatrix<double>.MatrixType => type;
 
-        public void AddLocal(int[] dofs, double[,] matrix, double coeff = 1d)
+        public void AddLocal(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d)
         {
-            for (int i = 0; i < dofs.Length; ++i)
+            for (int i = 0; i < dofsi.Length; ++i)
             {
-                for (int j = 0; j < dofs.Length; ++j)
+                for (int j = 0; j < dofsj.Length; ++j)
                 {
-                    int di = dofs[i];
-                    int dj = dofs[j];
+                    int di = dofsi[i];
+                    int dj = dofsj[j];
 
 
                     int ia0 = ia[di];
@@ -48,6 +48,26 @@ namespace Core
 
                     if (ind != -1)
                         LinqExtensions.ThreadSafeAdd(values, ind, coeff * matrix[i, j]);
+                }
+            }
+        }
+
+        public void AddLocalTransposed(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d)
+        {
+            for (int i = 0; i < dofsi.Length; ++i)
+            {
+                for (int j = 0; j < dofsj.Length; ++j)
+                {
+                    int di = dofsi[i];
+                    int dj = dofsj[j];
+
+
+                    int ia0 = ia[di];
+                    int ia1 = ia[di + 1];
+                    int ind = BinarySearch(ja, dj, ia0, ia1 - 1);
+
+                    if (ind != -1)
+                        LinqExtensions.ThreadSafeAdd(values, ind, coeff * matrix[j, i]);
                 }
             }
         }
