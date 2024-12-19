@@ -229,8 +229,8 @@ namespace Core
             }
         }
 
-
         public double[] AsArray() => new[] { X, Y, Z };
+
         public Vector2D As2D() => new Vector2D(X, Y);
 
         public double Norm => Math.Sqrt(X * X + Y * Y + Z * Z);

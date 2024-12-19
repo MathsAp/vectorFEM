@@ -209,7 +209,20 @@ IFiniteElement[] elements = [ new LinearVectorParallelepipedalFiniteElementWithN
                               new LinearVectorRectangularFiniteElementWithNumInteg("6", [2, 5, 11, 14]), new LinearVectorRectangularFiniteElementWithNumInteg("6", [5, 8, 14, 17]),
                               new LinearVectorRectangularFiniteElementWithNumInteg("6", [11, 14, 20, 23]), new LinearVectorRectangularFiniteElementWithNumInteg("6", [14, 17, 23, 26]) ];
 
-FiniteElementMesh mesh = new(elements, vertex);
+//FiniteElementMesh mesh = new(elements, vertex);
+
+Dictionary<int, string> materialNumbers = new()
+{
+    { 0, "volume" },
+    { 1, "1" },
+    { 2, "2" },
+    { 3, "3" },
+    { 4, "4" },
+    { 5, "5" },
+    { 6, "6" }
+};
+
+RegularParallelepipedalFiniteElementMesh mesh = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
 
 //Dictionary<string, IMaterial> Materials = new()
 //{
@@ -296,7 +309,7 @@ bool flag = true;
 //    flag = bool.Parse(Console.ReadLine()!);
 //}
 
-var sol = elements[24].BuildLocalRightPartWithFirstBoundaryConditions(vertex, mesh.FacePortrait, x => new Vector3D(0, x.Z, x.X));
+//var sol = elements[24].BuildLocalRightPartWithFirstBoundaryConditions(vertex, mesh.FacePortrait, x => new Vector3D(0, x.Z, x.X));
 
 while (flag)
 {
@@ -337,5 +350,17 @@ int[] test = [1, 2, 3, 4, 5, 6, 7, 8];
 Console.WriteLine(string.Join(", ", test[..4]));
 Console.WriteLine(string.Join(", ", test[4..]));
 
+//Dictionary<int, string> materialNumbers = new()
+//{
+//    { 0, "volume" },
+//    { 1, "1" },
+//    { 2, "2" },
+//    { 3, "3" },
+//    { 4, "4" },
+//    { 5, "5" },
+//    { 6, "6" }
+//};
+
+var test1 = new RegularParallelepipedalFiniteElementMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
 
 Console.WriteLine("Хотите продолжить?");

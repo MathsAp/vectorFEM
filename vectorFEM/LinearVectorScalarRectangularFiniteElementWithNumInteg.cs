@@ -39,6 +39,8 @@ namespace Core
 
             SquareMasterElementLinearVectorBasis VectorMasterElement { get; }
 
+           // IMasterElement<Vector2D, Vector3D, Vector3D> IFiniteElementWithNumericIntegration<Vector2D, Vector3D, Vector3D>.MasterElement => throw new NotImplementedException();
+
             public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff)
             {
                 int Ns = 4; // Количество скалярных неизвестных
@@ -62,6 +64,8 @@ namespace Core
 
 
                 var nodes = MasterElement.QuadratureNodes.Nodes;
+
+               // var vnodes = ((IFiniteElementWithNumericIntegration<Vector2D, Vector3D, Vector3D>)this).MasterElement.
 
                 var localCoeffInNodes = CalcLocalFuncInQuadratureNodes(LocalCoeff, nodes);
 
@@ -324,7 +328,7 @@ namespace Core
                 return faceTuple;
             }
 
-            (int, int) GetFaceNumbers(IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait)
+            public (int, int) GetFaceNumbers(IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait)
             {
                 (IFiniteElement? FE1, int scalarNumber) = FacePortrait[GetFaceTuple()].Item1;
                 (IFiniteElement? FE2, int vectorNumber) = FacePortrait[GetFaceTuple()].Item1;
