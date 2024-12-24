@@ -23,8 +23,6 @@ namespace Core
 
         public IFiniteElementMesh Mesh { get; }
 
-        public ITimeMesh TimeMesh { get; }
-
         PardisoSLAE? SLAE { get; set; }
 
         public void Prepare()
@@ -35,7 +33,8 @@ namespace Core
 
         public void Solve(ISolution result)
         {
-            Parallel.ForEach(Mesh.Elements, element =>
+            foreach(var element in Mesh.Elements)
+            //Parallel.ForEach(Mesh.Elements, element =>
             {
                 var material = Materials[element.Material];
 
@@ -45,6 +44,8 @@ namespace Core
                     {
                         var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, coeff => 1 / material.Mu(coeff));
                         SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                       // LinearAlgebraAlgorithms.PrintMatrix(LM);
 
                         LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
                         SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
@@ -56,6 +57,8 @@ namespace Core
                     {
                         var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, coeff => Constants.Mu0);
                         SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                     //   LinearAlgebraAlgorithms.PrintMatrix(LM);
 
                         var LRP = element.BuildLocalRightPart(Mesh.Vertex, coeff => material.F(coeff, 1));
                         SLAE?.AddLocalRightPart(element.Dofs, LRP);
@@ -76,24 +79,28 @@ namespace Core
                 }
                 else if (material.IsInterface)
                 {
-                    var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Interface, coeff => 1);
+                    var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Interface, Mesh.FacePortrait, coeff => 1);
                     SLAE?.Matrix.AddLocal(element.GetDofs(IFiniteElement.DofsType.Scalar), element.GetDofs(IFiniteElement.DofsType.Vector), LM, -1);
 
                     SLAE?.Matrix.AddLocalTransposed(element.GetDofs(IFiniteElement.DofsType.Vector), element.GetDofs(IFiniteElement.DofsType.Scalar), LM);
 
-                    var LRP = element.BuildLocalRightPart(Mesh.Vertex, coeff => material.Hext(coeff, 1));
+                    var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Mesh.FacePortrait, coeff => material.Hext(coeff, 1));
                     SLAE?.AddLocalRightPart(element.GetDofs(IFiniteElement.DofsType.Vector), LRP);
+
+                    //LinearAlgebraAlgorithms.PrintVector(LRP);
 
                     (int faceS, int faceV) = ((LinearVectorScalarRectangularFiniteElementWithNumInteg)element).GetFaceNumbers(Mesh.FacePortrait);
 
                     var n = LinearVectorParallelepipedalFiniteElementWithNumInteg.GetNormal(faceV);
 
-                    LRP = element.BuildLocalRightPart(Mesh.Vertex, coeff => -Constants.Mu0 * material.Hext(coeff, 1) * n);
+                    LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, coeff => -Constants.Mu0 * material.Hext(coeff, 1) * n);
                     SLAE?.AddLocalRightPart(element.GetDofs(DofsType.Scalar), LRP);
+
+                   // LinearAlgebraAlgorithms.PrintVector(LRP);
                 }
 
             }
-            );
+            //);
 
             foreach(var element in Mesh.Elements)
             {
@@ -113,6 +120,16 @@ namespace Core
                     }
                 }
             }
+
+            //((List<IFiniteElement>)Mesh.Elements)[0].
+
+           // int ind = ((List<IFiniteElement>)Mesh.Elements)[0].Dofs[8];
+
+           // SLAE.AddLocalRightPart([ind], [1]);
+
+
+           //LinearAlgebraAlgorithms.PrintMatrix(LinearAlgebraAlgorithms.SparseMatrixToDense((PardisoNonSymmMatrix)SLAE.Matrix));
+           //LinearAlgebraAlgorithms.PrintVector(SLAE.RightPart);
 
             using (PardisoSLAESolver solver = new(SLAE!))
             {

@@ -211,15 +211,24 @@ IFiniteElement[] elements = [ new LinearVectorParallelepipedalFiniteElementWithN
 
 //FiniteElementMesh mesh = new(elements, vertex);
 
+//Dictionary<int, string> materialNumbers = new()
+//{
+//    { 0, "volume" },
+//    { 1, "1" },
+//    { 2, "2" },
+//    { 3, "3" },
+//    { 4, "4" },
+//    { 5, "5" },
+//    { 6, "6" }
+//};
+
 Dictionary<int, string> materialNumbers = new()
 {
-    { 0, "volume" },
-    { 1, "1" },
-    { 2, "2" },
-    { 3, "3" },
-    { 4, "4" },
-    { 5, "5" },
-    { 6, "6" }
+    { 0, "vectorVolume" },
+    { 1, "scalarVolume" },
+    { 2, "1" },
+    { 3, "2" },
+    { 4, "interface" }
 };
 
 RegularParallelepipedalFiniteElementMesh mesh = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
@@ -246,15 +255,31 @@ RegularParallelepipedalFiniteElementMesh mesh = new("C:\\Users\\bossf\\source\\r
 //    { "6", new Material(false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D(x.Y * t, x.Z * t, 6 * t), (x, t) => 0, (x, t) => Vector3D.Zero) }
 //};
 
+//Dictionary<string, IMaterial> Materials = new()
+//{
+//    { "volume", new Material(true, false, false, false, x => 0, x => 4, x => 0, x => 5, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D(4 * (x.Y * x.Z + x.Y + x.Z + 5), 4 * (x.X * x.Z + x.X + x.Z + 8), 4 * (x.X * x.Y + x.X + x.Y + 11))) },
+//    { "1", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "3", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "4", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y + 5) * t, (x.X + 8) * t, (x.X * x.Y + x.X + x.Y + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "5", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Z + 5) * t, (x.X * x.Z + x.X + x.Z + 8) * t, (x.X + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "6", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5) * t, (7 * x.Z + 14) * t, (7 * x.Y + 17) * t), (x, t) => 0, (x, t) => Vector3D.Zero) }
+//};
+
+double I = 2;
+double x0 = 0;
+double y0 = 0;
+
+Func<Vector3D, double, Vector3D> RealHext = (x, t) => (I / (2 * Math.PI)) * new Vector3D(-(x.Y - y0) / ((x.X - x0) * (x.X - x0) + (x.Y - y0) * (x.Y - y0)), (x.X - x0) / ((x.X - x0) * (x.X - x0) + (x.Y - y0) * (x.Y - y0)), 0);
+Func<Vector3D, double, Vector3D> Hext = (x, t) => Vector3D.Zero;
+
 Dictionary<string, IMaterial> Materials = new()
 {
-    { "volume", new Material(true, false, false, false, x => 0, x => 4, x => 0, x => 5, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D(4 * (x.Y * x.Z + x.Y + x.Z + 5), 4 * (x.X * x.Z + x.X + x.Z + 8), 4 * (x.X * x.Y + x.X + x.Y + 11))) },
-    { "1", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "3", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => new Vector3D(0, 0, 0), (x, t) => Vector3D.Zero,(x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "4", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y + 5) * t, (x.X + 8) * t, (x.X * x.Y + x.X + x.Y + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "5", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Z + 5) * t, (x.X * x.Z + x.X + x.Z + 8) * t, (x.X + 11) * t), (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "6", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5) * t, (7 * x.Z + 14) * t, (7 * x.Y + 17) * t), (x, t) => 0, (x, t) => Vector3D.Zero) }
+    { "vectorVolume", new Material(true, false, false, false, x => 0, x => 0, x => 0, x => Constants.Mu0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "scalarVolume", new Material(true, false, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "1", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+    { "interface", new Material(false, false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) }
 };
 
 double[] t = [0, 2, 4, 6, 8, 10];
@@ -263,14 +288,15 @@ TimeMesh timeMesh = new(t);
 
 //EllipticProblem problem = new(mesh, Materials);
 
-VectorParabolicProblem problem = new(mesh, timeMesh, x => Vector3D.Zero, Materials);
+//VectorParabolicProblem problem = new(mesh, timeMesh, x => Vector3D.Zero, Materials);
 
+VectorScalarEllipticProblem problem = new(mesh, Materials);
 
 //VectorEllipticProblem problem = new(mesh, Materials);
 
 problem.Prepare();
 //EllipticSolution solution = new(mesh);
-ParabolicSolution solution = new(mesh, timeMesh);
+VectorScalarEllipticSolution solution = new(mesh, Materials);
 problem.Solve(solution);
 
 //Func<Vector3D, double> RealFunc = x => x.X * x.Y * x.Z + x.X * x.Y + x.X * x.Z + x.Y * x.Z + x.X + x.Y + x.Z + 5;
@@ -278,6 +304,7 @@ problem.Solve(solution);
 Func<Vector3D, double, Vector3D> RealFunc = (x, t) => new Vector3D(t * (x.Y * x.Z + x.Y + x.Z + 5), t * (x.X * x.Z + x.X + x.Z + 8), t * (x.X * x.Y + x.X + x.Y + 11));
 //Func<Vector3D, Vector3D> RealGradientFunc = x => new Vector3D(x.Y * x.Z + x.Y + x.Z + 1, x.X * x.Z + x.X + x.Z + 1, x.X * x.Y + x.X + x.Y + 1);
 Func<Vector3D, double, Vector3D> RealCurlFunc = (x, t) => new Vector3D(0, 0, 0);
+
 
 bool flag = true;
 
@@ -311,13 +338,40 @@ bool flag = true;
 
 //var sol = elements[24].BuildLocalRightPartWithFirstBoundaryConditions(vertex, mesh.FacePortrait, x => new Vector3D(0, x.Z, x.X));
 
-while (flag)
+//while (flag)
+//{
+//    Console.WriteLine("Введите время: ");
+//    double time = double.Parse(Console.ReadLine()!);
+
+//    solution.Time = time;
+
+//    Console.WriteLine("Введите x: ");
+//    double x = double.Parse(Console.ReadLine()!);
+
+//    Console.WriteLine("Введите y: ");
+//    double y = double.Parse(Console.ReadLine()!);
+
+//    Console.WriteLine("Введите z: ");
+//    double z = double.Parse(Console.ReadLine()!);
+
+//    Vector3D point = new Vector3D(x, y, z);
+
+//    Console.WriteLine($"time = {solution.Time}");
+//    Console.WriteLine($"Значение в точке численного решения ({x}; {y}; {z}) = " + solution.Vector(point));
+//    Console.WriteLine($"Значение в точке реального решения ({x}; {y}; {z}) = " + RealFunc(point, solution.Time));
+
+//    Vector3D curlNumerical = solution.Curl(point);
+//    Vector3D curlReal = RealCurlFunc(point, solution.Time);
+//    Console.WriteLine($"Ротор численного решения в точке ({x}; {y}; {z}) = " + curlNumerical);
+//    Console.WriteLine($"Ротор реального решения в точке ({x}; {y}; {z}) = " + curlReal);
+
+//    Console.WriteLine("Хотите продолжить?");
+
+//    flag = bool.Parse(Console.ReadLine()!);
+//}
+
+while (flag) // curr
 {
-    Console.WriteLine("Введите время: ");
-    double time = double.Parse(Console.ReadLine()!);
-
-    solution.Time = time;
-
     Console.WriteLine("Введите x: ");
     double x = double.Parse(Console.ReadLine()!);
 
@@ -329,14 +383,14 @@ while (flag)
 
     Vector3D point = new Vector3D(x, y, z);
 
-    Console.WriteLine($"time = {solution.Time}");
-    Console.WriteLine($"Значение в точке численного решения ({x}; {y}; {z}) = " + solution.Vector(point));
-    Console.WriteLine($"Значение в точке реального решения ({x}; {y}; {z}) = " + RealFunc(point, solution.Time));
+   // Console.WriteLine($"Значение в точке численного A ({x}; {y}; {z}) = " + solution.Vector(point));
+    //Console.WriteLine($"Значение в точке численного V ({x}; {y}; {z}) = " + solution.Value(point));
 
-    Vector3D curlNumerical = solution.Curl(point);
-    Vector3D curlReal = RealCurlFunc(point, solution.Time);
-    Console.WriteLine($"Ротор численного решения в точке ({x}; {y}; {z}) = " + curlNumerical);
-    Console.WriteLine($"Ротор реального решения в точке ({x}; {y}; {z}) = " + curlReal);
+    Console.WriteLine($"Значение в точке численного H ({x}; {y}; {z}) = " + solution.H(point));
+    Console.WriteLine($"Значение в точке реального H ({x}; {y}; {z}) = " + RealHext(point, 1));
+
+    Console.WriteLine($"Значение в точке численного B ({x}; {y}; {z}) = " + solution.B(point));
+    Console.WriteLine($"Значение в точке реального B ({x}; {y}; {z}) = " + Constants.Mu0 * RealHext(point, 1));
 
     Console.WriteLine("Хотите продолжить?");
 
@@ -344,6 +398,7 @@ while (flag)
 }
 
 IMasterElement<Vector2D, double, Vector3D> ME = SquareMasterElementLinearScalarBasis.GetInstance();
+var MEV = SquareMasterElementLinearVectorBasis.GetInstance();
 
 int[] test = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -364,3 +419,24 @@ Console.WriteLine(string.Join(", ", test[4..]));
 var test1 = new RegularParallelepipedalFiniteElementMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
 
 Console.WriteLine("Хотите продолжить?");
+
+//double[,] M = { { 1, 2 }, 
+//                { 3, 4 } };
+
+//int[] locDofs = new int[4];
+//SortedSet<int>[] profile = new SortedSet<int>[4];
+
+//for (int i = 0; i < 4; ++i)
+//{
+//    locDofs[i] = i;
+//    profile[i] = new();
+
+//    for (int j = 0; j < 4; ++j)
+//        profile[i].Add(j);
+//}
+
+//var SLAE = new PardisoSLAE(new PardisoNonSymmMatrix(profile, Quasar.Native.PardisoMatrixType.StructurallySymmetric));
+//SLAE.Matrix.AddLocalTransposed([2, 3], [0, 1], M);
+//SLAE.Matrix.AddLocal([0, 1], [2, 3], M, -1);
+
+//Console.WriteLine("Хотите продолжить?");

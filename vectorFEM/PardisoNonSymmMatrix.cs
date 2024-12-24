@@ -20,13 +20,13 @@ namespace Core
         public int N { get => ia.Length - 1; }
         int IPardisoMatrix<double>.n => ia.Length - 1;
 
-        int[] ia = Array.Empty<int>();
+        public int[] ia = Array.Empty<int>();
         ReadOnlySpan<int> IPardisoMatrix<double>.ia => ia;
 
-        int[] ja = Array.Empty<int>();
+        public int[] ja = Array.Empty<int>();
         ReadOnlySpan<int> IPardisoMatrix<double>.ja => ja;
 
-        double[] values = Array.Empty<double>();
+        public double[] values = Array.Empty<double>();
         ReadOnlySpan<double> IPardisoMatrix<double>.a => values;
 
         PardisoMatrixType type;
@@ -48,6 +48,8 @@ namespace Core
 
                     if (ind != -1)
                         LinqExtensions.ThreadSafeAdd(values, ind, coeff * matrix[i, j]);
+                  //  else
+                      //  throw new Exception();
                 }
             }
         }
@@ -68,6 +70,8 @@ namespace Core
 
                     if (ind != -1)
                         LinqExtensions.ThreadSafeAdd(values, ind, coeff * matrix[j, i]);
+                    //else
+                        //throw new Exception();
                 }
             }
         }

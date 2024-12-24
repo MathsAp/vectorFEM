@@ -138,7 +138,7 @@ namespace Core
                 double S = a.Distance(b) * a.Distance(c);
 
                 double LocalTheta(Vector2D p) => Theta(a * (1 - p.X) * (1 - p.Y) + b * p.X * (1 - p.Y) +
-                                                       c * (1 - p.X) * p.Y + d * p.X * p.Y);
+                                                       c * (1 - p.X) * p.Y       + d * p.X * p.Y);
 
                 var nodes = MasterElement.QuadratureNodes.Nodes;
 
@@ -331,7 +331,7 @@ namespace Core
             public (int, int) GetFaceNumbers(IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait)
             {
                 (IFiniteElement? FE1, int scalarNumber) = FacePortrait[GetFaceTuple()].Item1;
-                (IFiniteElement? FE2, int vectorNumber) = FacePortrait[GetFaceTuple()].Item1;
+                (IFiniteElement? FE2, int vectorNumber) = FacePortrait[GetFaceTuple()].Item2;
 
                 if (FE1!.Type == ElementType.Vector)
                     (scalarNumber, vectorNumber) = (vectorNumber, scalarNumber);

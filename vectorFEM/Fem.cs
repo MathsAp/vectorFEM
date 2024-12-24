@@ -21,7 +21,7 @@ namespace FEM
                     edge = (element.VertexNumber[edge.i], element.VertexNumber[edge.j]);
                     if (edge.i < edge.j) edge = (edge.j, edge.i);
                     var n = element.DOFOnEdge(i, element.Type);
-                    if (!dict.TryGetValue(edge, out int c) || c > n) dict[edge] = n;
+                    if (!dict.TryGetValue(edge, out int c) || c < n) dict[edge] = n;
                 }
             }
             return dict;

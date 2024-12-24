@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FEM;
 using Quasar.Native;
 
 namespace Core
@@ -91,6 +92,54 @@ namespace Core
             }
 
             return new Vector3D(result);
+        }
+
+        public static void PrintMatrix(double[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            Console.WriteLine();
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
+        public static void PrintVector(ReadOnlySpan<double> vector)
+        {
+            Console.WriteLine();
+            for (int i = 0; i < vector.Length; ++i)
+            {
+                Console.WriteLine(vector[i]);
+            }
+            Console.WriteLine();
+        }
+
+        public static double[,] SparseMatrixToDense(PardisoNonSymmMatrix matrix)
+        {
+            int N = matrix.N;
+
+            double[,] newMatrix = new double[N, N];
+
+            for (int i = 0; i < N; ++i)
+            {
+                int ia0 = matrix.ia[i];
+                int ia1 = matrix.ia[i + 1];
+
+                for (int k = ia0; k < ia1; ++k)
+                {
+                    int j = matrix.ja[k];
+
+                    newMatrix[i, j] = matrix.values[k];
+                }
+            }
+
+            return newMatrix;
         }
     }
 }

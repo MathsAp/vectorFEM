@@ -50,7 +50,7 @@ namespace Core
         {
             foreach (var element in Mesh.Elements)
             {
-                if (element.VertexNumber.Length != 2)
+                if (element.VertexNumber.Length > 4)
                 {
                     if (element.IsPointOnElement(Mesh.Vertex, point))
                     {
@@ -80,7 +80,7 @@ namespace Core
         {
             foreach (var element in Mesh.Elements)
             {
-                if (element.VertexNumber.Length != 2)
+                if (element.VertexNumber.Length > 4)
                 {
                     if (element.IsPointOnElement(Mesh.Vertex, point))
                     {
