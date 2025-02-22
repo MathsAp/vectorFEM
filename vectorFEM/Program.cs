@@ -7,6 +7,10 @@ using FEM;
 using Quadratures;
 using System.Runtime.CompilerServices;
 
+var calculator = new TelmaCoilCalculator();
+await calculator.Load("D:\\Telma\\Projects\\coilProject.TelmaProject", "default");
+
+Console.WriteLine(calculator.Hext(Vector3D.Zero, 10));
 //double func(double x, double y, double z)
 //{
 //    return 10 * Math.Pow(x, 9) * 10 * Math.Pow(y, 9) * 10 * Math.Pow(z, 9);

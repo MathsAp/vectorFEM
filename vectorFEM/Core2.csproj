@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Quasar.Native" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="D:\Telma\Telma\TelmaProjects\Core\Core.csproj" />
+    <ProjectReference Include="D:\Telma\Telma\TelmaProjects\TelmaConsole\TelmaConsole.csproj" />
+    <ProjectReference Include="D:\Telma\Telma\TelmaProjects\UIViewModels\UIViewModels.csproj" />
+    <ProjectReference Include="D:\Telma\Telma\TelmaQuasarCommon\TelmaQuasarCommon.csproj" />
+  </ItemGroup>
+
+</Project>

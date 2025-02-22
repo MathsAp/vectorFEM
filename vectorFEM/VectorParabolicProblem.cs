@@ -31,8 +31,8 @@ namespace Core
         public void Prepare()
         {
             FemAlgorithms.EnumerateMeshDofs(Mesh);
-            //SLAE = new(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
-            SLAE = new(new PardisoNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.StructurallySymmetric));
+            SLAE = new(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+            //SLAE = new(new PardisoNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.StructurallySymmetric));
             TimeMesh.ChangeCoefs(GetWeightsForInitialCondition());
         }
 
