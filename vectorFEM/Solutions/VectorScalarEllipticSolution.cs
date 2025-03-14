@@ -138,5 +138,10 @@ namespace Core
 
             return Vector3D.Zero;
         }
+
+        public double CalcNormL2(Func<Vector3D, Vector3D> u)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

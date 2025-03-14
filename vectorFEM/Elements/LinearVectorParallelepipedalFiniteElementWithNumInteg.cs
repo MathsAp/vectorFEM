@@ -453,8 +453,6 @@ namespace Core
                     }
                 }
 
-
-
                 public int[] GetDofs(DofsType type)
                 {
                     throw new NotImplementedException();
@@ -463,6 +461,56 @@ namespace Core
                 public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff)
                 {
                     throw new NotImplementedException();
+                }
+
+                public double CalclIntegralOfSquaredDifference(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Func<Vector3D, Vector3D> u)
+                {
+                    int N = Dofs.Length;
+
+                    double x0 = VertexCoords[VertexNumber[0]].X;
+                    double hx = VertexCoords[VertexNumber[1]].X - x0;
+
+                    double y0 = VertexCoords[VertexNumber[0]].Y;
+                    double hy = VertexCoords[VertexNumber[2]].Y - y0;
+
+                    double z0 = VertexCoords[VertexNumber[0]].Z;
+                    double hz = VertexCoords[VertexNumber[4]].Z - z0;
+
+                    Vector3D LocalU(Vector3D point) => u(new(point.X * hx + x0, point.Y * hy + y0, point.Z * hz + z0));
+
+                    var nodes = MasterElement.QuadratureNodes.Nodes;
+
+                    double value = 0;
+
+                    for (int k = 0; k < nodes.Length; ++k)
+                    {
+                        Vector3D sum = Vector3D.Zero;
+
+                        for (int i = 0; i < N; ++i)
+                        {
+                            sum += coeffs[Dofs[i]] * MasterElement.PsiValues[i, k];
+                        }
+
+                        Vector3D diff = sum - LocalU(nodes[k].Node);
+
+                        value += nodes[k].Weight * diff * diff;
+                    }
+
+                    value *= hx * hy * hz;
+
+                    return value;
+                }
+
+                Vector3D[] CalcLocalFuncInQuadratureNodes(Func<Vector3D, Vector3D> LocalFunc, Quadratures.QuadratureNode<Vector3D>[] nodes)
+                {
+                    Vector3D[] values = new Vector3D[nodes.Length];
+
+                    for (int k = 0; k < nodes.Length; ++k)
+                    {
+                        values[k] = LocalFunc(nodes[k].Node);
+                    }
+
+                    return values;
                 }
             }
         }

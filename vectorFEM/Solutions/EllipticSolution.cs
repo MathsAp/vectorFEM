@@ -12,24 +12,19 @@ namespace Core
         public EllipticSolution(IFiniteElementMesh mesh) 
         { 
             Mesh = mesh;
-            solutionVector = new double[mesh.NumberOfDofs];
+           // solutionVector = new double[mesh.NumberOfDofs];
         }
         public double Time { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public ITimeMesh TimeMesh => throw new NotImplementedException();
 
         public IFiniteElementMesh Mesh { get; }
 
-        double[] solutionVector { get; }
+        double[] solutionVector = [];
         public ReadOnlySpan<double> SolutionVector => solutionVector;
 
         public void AddSolutionVector(double t, double[] solution)
         {
-            int N = Mesh.NumberOfDofs;
-
-            for (int i = 0; i < N; ++i)
-            {
-                solutionVector[i] = solution[i];
-            }
+            solutionVector = solution;
         }
 
         public Vector3D Gradient(Vector3D point)
@@ -90,6 +85,22 @@ namespace Core
             }
 
             return Vector3D.Zero;
+        }
+
+        public double CalcNormL2(Func<Vector3D, Vector3D> u)
+        {
+            double value = 0;
+            foreach (var elem in Mesh.Elements)
+            {
+                if (elem.VertexNumber.Length > 4)
+                {
+                    value += elem.CalclIntegralOfSquaredDifference(Mesh.Vertex, solutionVector, u);
+                }
+            }
+
+            value = Math.Sqrt(value);
+
+            return value;
         }
     }
 }

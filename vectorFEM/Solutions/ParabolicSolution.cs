@@ -149,6 +149,11 @@ namespace Core
 
             return mid;
         }
+
+        public double CalcNormL2(Func<Vector3D, Vector3D> u)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     //public class Solution2 : ISolution

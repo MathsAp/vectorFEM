@@ -43,6 +43,9 @@ namespace FEM
         Vector3D GetVectorAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение векторного поля в точке на конечном элементе
         Vector3D GetGradientAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить градиент в точке на конечном элементе
         Vector3D GetCurlAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point); // Получить значение ротора векторного поля в точке на конечном элементе
+
+        double CalclIntegralOfSquaredDifference(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Func<Vector3D, Vector3D> u);
+
     }
     public interface IFiniteElementWithNumericIntegration<T1, T2, T3> : IFiniteElement
     {
@@ -127,6 +130,8 @@ namespace FEM
         void AddSolutionVector(double t, double[] solution);
         double Value(Vector3D point);
         Vector3D Gradient(Vector3D point);
+
+        double CalcNormL2(Func<Vector3D, Vector3D> u);
     }
 
     public interface IMatrix

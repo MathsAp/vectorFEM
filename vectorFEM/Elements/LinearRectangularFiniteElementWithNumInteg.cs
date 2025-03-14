@@ -220,6 +220,11 @@ namespace Core
                 {
                     throw new NotImplementedException();
                 }
+
+                public double CalclIntegralOfSquaredDifference(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Func<Vector3D, Vector3D> u)
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
     }
