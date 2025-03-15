@@ -437,15 +437,24 @@ Func<Vector3D, double, Vector3D> Hext = (x, t) => Vector3D.Zero;
 //};
 
 // Четвертый тест
+//Dictionary<string, IMaterial> Materials = new()
+//{
+//    { "vectorVolume", new Material(true, false, false, false, lambda => 0, sigma => sigma.X + sigma.Y + sigma.Z, epsilon => 0, mu => 5, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => new Vector3D((fv.X + fv.Y + fv.Z) * (fv.Y * fv.Z + fv.Y + fv.Z + 5), (fv.X + fv.Y + fv.Z) * (fv.X * fv.Z + fv.X + fv.Z + 8), (fv.X + fv.Y + fv.Z) * (fv.X * fv.Y + fv.X + fv.Y + 11))) },
+//    { "2", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Z + 5, ag.X * ag.Z + ag.X + ag.Z + 8, ag.X + 11), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+//    { "3", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Y + 5, ag.X + 8, ag.X * ag.Y + ag.X + ag.Y + 11), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+//    { "4", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Y * ag.Z + ag.Y + ag.Z + 5, 5 * ag.Z + 12, 5 * (ag.Y + 3)), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+//    { "5", new Material(false, false, true, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => Vector3D.Zero) }
+//};
+
+// Пятый тест 
 Dictionary<string, IMaterial> Materials = new()
 {
-    { "vectorVolume", new Material(true, false, false, false, lambda => 0, sigma => sigma.X + sigma.Y + sigma.Z, epsilon => 0, mu => 5, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => new Vector3D((fv.X + fv.Y + fv.Z) * (fv.Y * fv.Z + fv.Y + fv.Z + 5), (fv.X + fv.Y + fv.Z) * (fv.X * fv.Z + fv.X + fv.Z + 8), (fv.X + fv.Y + fv.Z) * (fv.X * fv.Y + fv.X + fv.Y + 11))) },
-    { "2", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Z + 5, ag.X * ag.Z + ag.X + ag.Z + 8, ag.X + 11), (f, t) => 0, (fv, t) => Vector3D.Zero) },
-    { "3", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Y + 5, ag.X + 8, ag.X * ag.Y + ag.X + ag.Y + 11), (f, t) => 0, (fv, t) => Vector3D.Zero) },
-    { "4", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Y * ag.Z + ag.Y + ag.Z + 5, 5 * ag.Z + 12, 5 * (ag.Y + 3)), (f, t) => 0, (fv, t) => Vector3D.Zero) },
-    { "5", new Material(false, false, true, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => Vector3D.Zero) }
+    { "vectorVolume", new Material(true, false, false, false, lambda => 0, sigma => 4, epsilon => 0, mu => 1 / (mu.X + mu.Y + mu.Z), (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => new Vector3D(4 * fv.Z, 4 * fv.X, 4 * fv.Y)) },
+    { "2", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Z, ag.X, 0), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+    { "3", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(0, ag.X, ag.Y), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+    { "4", new Material(false, true, false, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => Vector3D.Zero, (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => new Vector3D(ag.Z, 4, ag.Y), (f, t) => 0, (fv, t) => Vector3D.Zero) },
+    { "5", new Material(false, false, true, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => new Vector3D(htheta.X + htheta.Y + htheta.Z, htheta.X + htheta.Y + htheta.Z, htheta.X + htheta.Y + htheta.Z), (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => Vector3D.Zero) }
 };
-
 
 double[] t = [0, 2, 4, 6, 8, 10];
 
@@ -478,7 +487,10 @@ problem.Solve(solution);
 //Func<Vector3D, Vector3D> RealFunc = x => new Vector3D((x.Y * x.Z + x.Y + x.Z + x.X + 5), (x.X * x.Z + x.X + x.Z + x.Y + 8), (x.X * x.Y + x.X + x.Y + x.Z + 11));
 
 // Четвертый тест
-Func<Vector3D, Vector3D> RealFunc = x => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5), (x.X * x.Z + x.X + x.Z + 8), (x.X * x.Y + x.X + x.Y + 11));
+//Func<Vector3D, Vector3D> RealFunc = x => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5), (x.X * x.Z + x.X + x.Z + 8), (x.X * x.Y + x.X + x.Y + 11));
+
+// Пятый тест
+Func<Vector3D, Vector3D> RealFunc = x => new Vector3D(x.Z, x.X, x.Y);
 
 //Func<Vector3D, Vector3D> RealGradientFunc = x => new Vector3D(x.Y * x.Z + x.Y + x.Z + 1, x.X * x.Z + x.X + x.Z + 1, x.X * x.Y + x.X + x.Y + 1);
 
@@ -492,7 +504,10 @@ Func<Vector3D, Vector3D> RealFunc = x => new Vector3D((x.Y * x.Z + x.Y + x.Z + 5
 //Func<Vector3D, double, Vector3D> RealCurlFunc = (x, t) => new Vector3D(0, 0, 0);
 
 // Четвертый тест
-Func<Vector3D, double, Vector3D> RealCurlFunc = (x, t) => new Vector3D(0, 0, 0);
+//Func<Vector3D, double, Vector3D> RealCurlFunc = (x, t) => new Vector3D(0, 0, 0);
+
+// Пятый тест
+Func<Vector3D, double, Vector3D> RealCurlFunc = (x, t) => new Vector3D(1, 1, 1);
 
 
 
