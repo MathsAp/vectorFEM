@@ -33,8 +33,8 @@ namespace Core
 
         public void Solve(ISolution result)
         {
-            foreach(var element in Mesh.Elements)
-            //Parallel.ForEach(Mesh.Elements, element =>
+            //foreach(var element in Mesh.Elements)
+            Parallel.ForEach(Mesh.Elements, element =>
             {
                 var material = Materials[element.Material];
 
@@ -100,7 +100,7 @@ namespace Core
                 }
 
             }
-            //);
+            );
 
             foreach(var element in Mesh.Elements)
             {

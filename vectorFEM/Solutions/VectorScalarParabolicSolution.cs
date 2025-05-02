@@ -19,7 +19,7 @@ namespace Core
             solutionVector = new double[mesh.NumberOfDofs];
 
             if (_path.Length == 0)
-                path = "ParabolicProblemWeights";
+                path = "VectorScalarParabolicProblemWeights";
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -150,7 +150,7 @@ namespace Core
                         }
                         else if (element.Type == IFiniteElement.ElementType.Scalar)
                         {
-                            return material.Hext(point, 1) - element.GetGradientAtPoint(Mesh.Vertex, solutionVector, point);
+                            return material.Hext(point, Time) - element.GetGradientAtPoint(Mesh.Vertex, solutionVector, point);
                         }
                     }
                 }
@@ -175,7 +175,7 @@ namespace Core
                         }
                         else if (element.Type == IFiniteElement.ElementType.Scalar)
                         {
-                            return Constants.Mu0 * (material.Hext(point, 1) - element.GetGradientAtPoint(Mesh.Vertex, solutionVector, point));
+                            return Constants.Mu0 * (material.Hext(point, Time) - element.GetGradientAtPoint(Mesh.Vertex, solutionVector, point));
                         }
                     }
                 }

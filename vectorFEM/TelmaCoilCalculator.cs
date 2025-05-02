@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TelmaConsole;
 using TelmaQuasarCommon.Core.ContextInterfaces;
-using TelmaQuasarCommon.ProblemBase;
 using TelmaQuasarCommon.Problems;
 using TelmaQuasarCommon.ProjectSystem;
+
 
 namespace Core
 {
@@ -49,7 +49,7 @@ namespace Core
 
             H *= problem.SourceTimeMultiplier.Value(default, t);
 
-            return new Core.Vector3D(H.AsArray()) ;
+            return new Core.Vector3D(H.AsSpan()) ;
         }
         
         static void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)

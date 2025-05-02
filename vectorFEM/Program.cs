@@ -126,40 +126,40 @@ Console.WriteLine($"Value = {Math.Sqrt(value)}");
 
 */
 
-//double func(double x, double y, double z)
-//{
-//    return 10 * Math.Pow(x, 9) * 10 * Math.Pow(y, 9) * 10 * Math.Pow(z, 9);
-//}
+double func(double x, double y, double z)
+{
+    return 10 * Math.Pow(x, 9) * 10 * Math.Pow(y, 9) * 10 * Math.Pow(z, 9);
+}
 
-//QuadratureNodes<Vector3D> QuadratureNodes;
+QuadratureNodes<Vector3D> QuadratureNodes;
 
-//QuadratureNodes = NumericalIntegration.FactoryQuadratures3D(9, ElemType.Cube);
+QuadratureNodes = NumericalIntegration.FactoryQuadratures3D(9, ElemType.Cube);
 
-//double x0 = -1;
-//double x1 = 2;
+double x00 = 2;
+double x1 = -1;
 
-//double y0 = 1;
-//double y1 = 2;
+double y00 = 2;
+double y1 = 1;
 
-//double z0 = -3;
-//double z1 = 1;
+double z0 = 1;
+double z1 = -3;
 
-//double hx = x1 - x0;
-//double hy = y1 - y0;
-//double hz = z1 - z0;
+double hx = x1 - x00;
+double hy = y1 - y00;
+double hz = z1 - z0;
 
-//int n = QuadratureNodes.Nodes.Length;
+int n = QuadratureNodes.Nodes.Length;
 
-//double result = 0; 
-//for (int i = 0; i < n; ++i)
-//{
-//    var node = QuadratureNodes.Nodes[i].Node;
-//    result += QuadratureNodes.Nodes[i].Weight * func(node.X * hx + x0, node.Y * hy + y0, node.Z * hz + z0);
-//}
+double result = 0;
+for (int i = 0; i < n; ++i)
+{
+    var node = QuadratureNodes.Nodes[i].Node;
+    result += QuadratureNodes.Nodes[i].Weight * func(node.X * hx + x00, node.Y * hy + y00, node.Z * hz + z0);
+}
 
-//result *= hx * hy * hz;
+result *= hx * hy * hz;
 
-//Console.WriteLine($"Значение интеграла = {result} \n ");
+Console.WriteLine($"Значение интеграла = {result} \n ");
 
 //Vector3D vec = Vector3D.Zero;
 
@@ -590,6 +590,11 @@ bool flag = true;
 //    flag = bool.Parse(Console.ReadLine()!);
 //}
 
+Vector3D[] points =  [ new Vector3D(0.09, 0, 0),       new Vector3D(0.11, 0, 0),       new Vector3D(0.3, 0, 0),
+                       new Vector3D(0, 0, 0.09),       new Vector3D(0, 0, 0.11),       new Vector3D(0, 0, 0.3),
+                       new Vector3D(0.09, 0.09, 0.09), new Vector3D(0.11, 0.11, 0.11), new Vector3D(0.3, 0.3, 0.3) ];
+
+WriteResultsToFile();
 while (flag) // curr vkr
 {
     Console.WriteLine("Введите время: ");
@@ -621,6 +626,32 @@ while (flag) // curr vkr
 
     flag = bool.Parse(Console.ReadLine()!);
 }
+
+void WriteResultsToFile(string path = "")
+{
+    if (path.Length == 0)
+        path = "ParabolicProblemSolutionAtPoints";
+
+    if (Directory.Exists(path))
+        Directory.Delete(path, true);
+
+    Directory.CreateDirectory(path!);
+
+    foreach(var p in points)
+    {
+        using (StreamWriter writer = new StreamWriter(Path.Combine(path, p.ToString() + ".txt"), false))
+        {
+            for (int i = 0; i < timeMesh.Size(); ++i)
+            {
+                solution.Time = timeMesh[i];
+                writer.WriteLine($"{solution.Time:F2}    {solution.B(p).X:E12}   {solution.B(p).Y:E12}   {solution.B(p).Z:E12}   {solution.B(p).Norm:E12}");
+            }
+        }
+    }
+
+    Console.WriteLine("Done");
+}
+
 
 //IMasterElement<Vector2D, double, Vector3D> ME = SquareMasterElementLinearScalarBasis.GetInstance();
 //var MEV = SquareMasterElementLinearVectorBasis.GetInstance();
