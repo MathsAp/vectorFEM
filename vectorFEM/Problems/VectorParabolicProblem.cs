@@ -120,7 +120,7 @@ namespace Core
                         SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM, timeCoeffs[0]);
                         for (int i = 1; i < scheme; ++i)
                         {
-                            LRP = LinearAlgebraAlgorithms.MultiplyMatrixVector(LM, GetLocalCoeffs(LC, element.Dofs, TimeMesh.Coefs(i)), timeCoeffs[i]);
+                            LRP = LinearAlgebraAlgorithms.MultiplyMatrixByVector(LM, GetLocalCoeffs(LC, element.Dofs, TimeMesh.Coefs(i)), timeCoeffs[i]);
                             SLAE?.AddLocalRightPart(element.Dofs, LRP);
                         }
                     }

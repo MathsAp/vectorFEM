@@ -11,7 +11,7 @@ namespace Core
 {
     public static class LinearAlgebraAlgorithms
     {
-        public static double[] MultiplyMatrixVector(double[,] matrix, double[] vector, double coeff = 1d)
+        public static double[] MultiplyMatrixByVector(double[,] matrix, double[] vector, double coeff = 1d)
         {
             int rows = matrix.GetLength(0);
             int cols = matrix.GetLength(1);
@@ -37,7 +37,7 @@ namespace Core
             return result;
         }
 
-        public static double[] MultiplyMatrixVector(double[,] matrix, ReadOnlySpan<double> vector, double coeff = 1d)
+        public static double[] MultiplyMatrixByVector(double[,] matrix, ReadOnlySpan<double> vector, double coeff = 1d)
         {
             int rows = matrix.GetLength(0);
             int cols = matrix.GetLength(1);
@@ -92,6 +92,58 @@ namespace Core
             }
 
             return new Vector3D(result);
+        }
+
+        public static Vector3D MultiplyMatrix3By3ByVector(double[,] matrix, Vector3D vector, double coeff = 1d)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            if (rows != 3 || cols != 3)
+            {
+                throw new ArgumentException("Матрица имеет размер, отличный от 3 на 3");
+            }
+
+            double[] result = new double[rows];
+
+            for (int i = 0; i < rows; ++i)
+            {
+                double sum = 0;
+                for (int j = 0; j < cols; ++j)
+                {
+                    sum += matrix[i, j] * vector[j];
+                }
+
+                result[i] = coeff * sum;
+            }
+
+            return new Vector3D(result);
+        }
+
+        public static Vector2D MultiplyMatrix2By2ByVector(double[,] matrix, Vector2D vector, double coeff = 1d)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            if (rows != 2 || cols != 2)
+            {
+                throw new ArgumentException("Матрица имеет размер, отличный от 2 на 2");
+            }
+
+            double[] result = new double[rows];
+
+            for (int i = 0; i < rows; ++i)
+            {
+                double sum = 0;
+                for (int j = 0; j < cols; ++j)
+                {
+                    sum += matrix[i, j] * vector[j];
+                }
+
+                result[i] = coeff * sum;
+            }
+
+            return new Vector2D(result);
         }
 
         public static void PrintMatrix(double[,] matrix)

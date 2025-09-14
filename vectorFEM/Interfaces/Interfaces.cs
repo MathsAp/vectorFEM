@@ -10,7 +10,7 @@ namespace FEM
     {
         ElementType Type { get; }
         string Material { get; }
-        enum MatrixType { Stiffness, Mass, Interface }
+        enum MatrixType { Stiffness, Mass, Interface, Convection }
         enum ElementType { Scalar, Vector, VectorScalar };
         enum DofsType { Scalar, Vector };
         int[] VertexNumber { get; } // в порядке локальной нумерации вершин 
@@ -28,7 +28,7 @@ namespace FEM
         void SetElementDOF(int n, int dof);
         int[] Dofs { get; }
         int[] GetDofs(DofsType type);
-        double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, Func<Vector3D, double> Coeff); // у коэффициента первый параметр в локальных координатах элемента - зачем в локальных координатах?
+        double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, Func<Vector3D, double> Coeff, Func<Vector3D, Vector3D>? Velocity = null); // у коэффициента первый параметр в локальных координатах элемента - зачем в локальных координатах?
                                                                                                             // Как будем понимать, интегрируем или коэффициент раскладывается, если он не постоянный?
         double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, double> Coeff);
         double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, double> F); // у коэффициента первый параметр в локальных координатах элемента  

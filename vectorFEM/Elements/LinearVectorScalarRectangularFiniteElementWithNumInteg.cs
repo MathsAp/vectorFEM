@@ -99,7 +99,7 @@ namespace Core
                 return LM;
             }
 
-            public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, Func<Vector3D, double> Coeff)
+            public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, MatrixType type, Func<Vector3D, double> Coeff, Func<Vector3D, Vector3D>? Velocity = null)
             {
                 throw new NotImplementedException();
             }

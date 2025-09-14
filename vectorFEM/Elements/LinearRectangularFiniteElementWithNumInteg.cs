@@ -37,19 +37,143 @@ namespace Core
 
                 public ElementType Type => ElementType.Scalar;
 
-                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff)
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff, Func<Vector3D, Vector3D>? Velocity = null)
                 {
-                    throw new NotImplementedException();
+                    int N = Dofs.Length;
+                    double[,] LM = new double[N, N];
+
+                    Vector3D a = VertexCoords[VertexNumber[0]];
+                    Vector3D b = VertexCoords[VertexNumber[1]];
+                    Vector3D c = VertexCoords[VertexNumber[2]];
+                    Vector3D d = VertexCoords[VertexNumber[3]];
+
+                    double hx = a.Distance(b);
+                    double hy = a.Distance(c);
+
+                    double S = hx * hy;
+
+                    double LocalCoeff(Vector2D p) => Coeff(a * (1 - p.X) * (1 - p.Y) + b * p.X * (1 - p.Y) +
+                                                           c * (1 - p.X) * p.Y       + d * p.X * p.Y);
+
+                    var nodes = MasterElement.QuadratureNodes.Nodes;
+                    var localCoeffInNodes = CalcLocalFuncInQuadratureNodes(LocalCoeff, nodes);
+
+                    switch (type)
+                    {
+                        case MatrixType.Stiffness:
+
+                            double[,] JTJ = { { 1 / (hx * hx), 0             }, 
+                                              { 0,             1 / (hy * hy) } };
+
+                            for (int i = 0; i < N; ++i)
+                            {
+                                for (int j = 0; j < N; ++j)
+                                {
+                                    double sum = 0;
+                                    for (int k = 0; k < nodes.Length; ++k)
+                                    {
+                                        sum += nodes[k].Weight * MasterElement.GradValues[i, k] 
+                                                            * LinearAlgebraAlgorithms.MultiplyMatrix2By2ByVector(JTJ, MasterElement.GradValues[j, k]) 
+                                                            * localCoeffInNodes[k];
+                                    }
+
+                                    LM[i, j] = sum * S;
+                                }
+                            }
+
+                            break;
+                        case MatrixType.Mass:
+
+                            for (int i = 0; i < N; ++i)
+                            {
+                                for (int j = 0; j < N; ++j)
+                                {
+                                    double sum = 0;
+                                    for (int k = 0; k < nodes.Length; ++k)
+                                    {
+                                        sum += localCoeffInNodes[k] * MasterElement.PsiPsiMatrix[k, i, j];
+                                    }
+
+                                    LM[i, j] = sum * S;
+                                }
+                            }
+
+                            break;
+                        case MatrixType.Convection:
+
+                            Vector2D LocalVelocity(Vector2D p)
+                            {
+                                if (Velocity is null) return Vector2D.Zero;
+
+                                var res = Velocity(a * (1 - p.X) * (1 - p.Y) + b * p.X * (1 - p.Y) +
+                                                   c * (1 - p.X) * p.Y       + d * p.X * p.Y);
+
+                                return new Vector2D(res.X, res.Y);
+                            }
+
+                            double[,] J = { { 1 / hx, 0      },
+                                            { 0,      1 / hy } };
+
+                            var localVelocityInNodes = CalcLocalFuncInQuadratureNodes(LocalVelocity, nodes);
+
+                            for (int i = 0; i < N; ++i)
+                            {
+                                for (int j = 0; j < N; ++j)
+                                {
+                                    double sum = 0;
+                                    for (int k = 0; k < nodes.Length; ++k)
+                                    {
+                                        sum += nodes[k].Weight * localVelocityInNodes[k]
+                                            * LinearAlgebraAlgorithms.MultiplyMatrix2By2ByVector(J, MasterElement.GradValues[j, k])
+                                            * MasterElement.PsiValues[i, k]
+                                            * localCoeffInNodes[k];
+                                    }
+
+                                    LM[i, j] = sum * S;
+                                }
+                            }
+
+                            break;
+
+                        default:
+                            throw new ArgumentException();
+                    }
+
+                    return LM;
                 }
 
                 public double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, double> F)
                 {
-                    throw new NotImplementedException();
-                }
+                    int N = Dofs.Length;
 
-                public double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> F)
-                {
-                    throw new NotImplementedException();
+                    double[] LRP = new double[N];
+
+                    Vector3D a = VertexCoords[VertexNumber[0]];
+                    Vector3D b = VertexCoords[VertexNumber[1]];
+                    Vector3D c = VertexCoords[VertexNumber[2]];
+                    Vector3D d = VertexCoords[VertexNumber[3]];
+
+                    double S = a.Distance(b) * a.Distance(c);
+
+                    double LocalF(Vector2D p) => F(a * (1 - p.X) * (1 - p.Y) + b * p.X * (1 - p.Y) +
+                                                   c * (1 - p.X) * p.Y       + d * p.X * p.Y);
+
+                    var nodes = MasterElement.QuadratureNodes.Nodes;
+
+                    var localFInNodes = CalcLocalFuncInQuadratureNodes(LocalF, nodes);
+
+                    for (int i = 0; i < N; ++i)
+                    {
+                        double sum = 0;
+                        for (int k = 0; k < nodes.Length; ++k)
+                        {
+                            sum += nodes[k].Weight * MasterElement.PsiValues[i, k] * localFInNodes[k];
+                        }
+
+                        LRP[i] = sum * S;
+                    }
+
+                    return LRP;
                 }
 
                 public double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Ug)
@@ -64,11 +188,6 @@ namespace Core
                     }
 
                     return LRP;
-                }
-
-                public double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Ug)
-                {
-                    throw new NotImplementedException();
                 }
 
                 public double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, Func<Vector3D, double> Theta)
@@ -105,11 +224,6 @@ namespace Core
                     return LRP;
                 }
 
-                public double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Theta)
-                {
-                    throw new NotImplementedException();
-                }
-
                 public int DOFOnEdge(int edge, ElementType type) => 0;
 
                 public int DOFOnElement() => 0;
@@ -135,11 +249,30 @@ namespace Core
 
                 public int[] Face(int face) => face == 0 ? [0, 1, 2, 3] : throw new ArgumentException();
 
-
-                public Vector3D GetCurlAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
+                public void SetVertexDOF(int vertex, int dof)
                 {
-                    throw new NotImplementedException();
+                    switch (vertex)
+                    {
+                        case 0:
+                            Dofs[0] = dof;
+                            break;
+                        case 1:
+                            Dofs[1] = dof;
+                            break;
+                        case 2:
+                            Dofs[2] = dof;
+                            break;
+                        case 3:
+                            Dofs[3] = dof;
+                            break;
+
+                        default:
+                            throw new ArgumentException();
+                    }
+
                 }
+
+                
 
                 public Vector3D GetGradientAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
@@ -151,14 +284,32 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public Vector3D GetVectorAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
-                {
-                    throw new NotImplementedException();
-                }
-
                 public bool IsPointOnElement(Vector3D[] VertexCoords, Vector3D point)
                 {
                     throw new NotImplementedException();
+                }
+                public double[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, double> LocalFunc, Quadratures.QuadratureNode<Vector2D>[] nodes)
+                {
+                    double[] values = new double[nodes.Length];
+
+                    for (int k = 0; k < nodes.Length; ++k)
+                    {
+                        values[k] = LocalFunc(nodes[k].Node);
+                    }
+
+                    return values;
+                }
+
+                public Vector2D[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, Vector2D> LocalFunc, Quadratures.QuadratureNode<Vector2D>[] nodes)
+                {
+                    Vector2D[] values = new Vector2D[nodes.Length];
+
+                    for (int k = 0; k < nodes.Length; ++k)
+                    {
+                        values[k] = LocalFunc(nodes[k].Node);
+                    }
+
+                    return values;
                 }
 
                 public void SetEdgeDOF(int edge, int n, int dof, ElementType type)
@@ -176,41 +327,6 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public void SetVertexDOF(int vertex, int dof)
-                {
-                    switch (vertex)
-                    {
-                        case 0:
-                            Dofs[0] = dof;
-                            break;
-                        case 1: 
-                            Dofs[1] = dof;
-                            break;
-                        case 2:
-                            Dofs[2] = dof;
-                            break;
-                        case 3:
-                            Dofs[3] = dof;
-                            break;
-
-                        default:
-                            throw new ArgumentException();
-                    }
-
-                }
-
-                public double[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, double> LocalFunc, Quadratures.QuadratureNode<Vector2D>[] nodes)
-                {
-                    double[] values = new double[nodes.Length];
-
-                    for (int k = 0; k < nodes.Length; ++k)
-                    {
-                        values[k] = LocalFunc(nodes[k].Node);
-                    }
-
-                    return values;
-                }
-
                 public int[] GetDofs(DofsType type)
                 {
                     throw new NotImplementedException();
@@ -221,7 +337,32 @@ namespace Core
                     throw new NotImplementedException();
                 }
 
-                public double CalclIntegralOfSquaredDifference(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Func<Vector3D, Vector3D> u)
+                public double CalclIntegralOfSquaredDifference(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Func<Vector3D, Vector3D> u) //
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[] BuildLocalRightPart(Vector3D[] VertexCoords, Func<Vector3D, Vector3D> F)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[] BuildLocalRightPartWithFirstBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Ug)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public double[] BuildLocalRightPartWithSecondBoundaryConditions(Vector3D[] VertexCoords, IDictionary<(int, int, int, int), ((IFiniteElement?, int), (IFiniteElement?, int))> FacePortrait, Func<Vector3D, Vector3D> Theta)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Vector3D GetCurlAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Vector3D GetVectorAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
                     throw new NotImplementedException();
                 }

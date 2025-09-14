@@ -24,6 +24,7 @@ namespace FEM
                     if (!dict.TryGetValue(edge, out int c) || c < n) dict[edge] = n;
                 }
             }
+
             return dict;
         }
 
@@ -76,7 +77,7 @@ namespace FEM
             }
 
             var edges = BuildEdgePortrait(mesh);
-            edges = edges.ToDictionary(edgeinfo => edgeinfo.Key, edgeinfo => dof += edgeinfo.Value);
+            edges = edges.ToDictionary(edgeInfo => edgeInfo.Key, edgeInfo => dof += edgeInfo.Value);
 
             foreach (var element in mesh.Elements)
             {
@@ -108,6 +109,7 @@ namespace FEM
                     for (int j = 0; j < element.Dofs.Length; j++)
                         a[element.Dofs[i]].Add(element.Dofs[j]);
             }
+
             return a;
         }
 

@@ -38,7 +38,7 @@ namespace Core
 
                 public ElementType Type => ElementType.Vector;
 
-                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff)
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff, Func<Vector3D, Vector3D>? Velocity = null)
                 {
                     int N = Dofs.Length;
 

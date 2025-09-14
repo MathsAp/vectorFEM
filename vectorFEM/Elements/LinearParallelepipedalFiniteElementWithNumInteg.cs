@@ -38,7 +38,7 @@ namespace Core
 
                 public int NumberOfFaces => 6;
 
-                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff)
+                public double[,] BuildLocalMatrix(Vector3D[] VertexCoords, IFiniteElement.MatrixType type, Func<Vector3D, double> Coeff, Func<Vector3D, Vector3D>? Velocity = null)
                 {
                     int N = Dofs.Length;
 
@@ -77,7 +77,9 @@ namespace Core
 
                                     for (int k = 0; k < nodes.Length; ++k)
                                     {
-                                        sum += nodes[k].Weight * MasterElement.GradValues[i, k] * LinearAlgebraAlgorithms.MultiplyMatrix3By3ByVector(JTJ, MasterElement.GradValues[j, k].AsArray()) * localCoeffInNodes[k];
+                                        sum += nodes[k].Weight * MasterElement.GradValues[i, k] 
+                                                            * LinearAlgebraAlgorithms.MultiplyMatrix3By3ByVector(JTJ, MasterElement.GradValues[j, k].AsArray()) 
+                                                            * localCoeffInNodes[k];
                                     }
 
                                     LM[i, j] = sum * V;

@@ -152,6 +152,20 @@ namespace FEM
             return psiValues;
         }
 
+        public static double[,] CalcScalarPsiValues(int n, QuadratureNodes<double> quadratureNodes)
+        {
+            double[,] psiValues = new double[n, quadratureNodes.Nodes.Length];
+
+            for (int i = 0; i < n; ++i)
+                for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
+                {
+                    var node = quadratureNodes.Nodes[j].Node;
+                    psiValues[i, j] = LinearBasis.Phi[i](node);
+                }
+
+            return psiValues;
+        }
+
         public static Vector3D[,] CalcCurlValues(int n, QuadratureNodes<Vector3D> quadratureNodes)
         {
             Vector3D[,] curlValues = new Vector3D[n, quadratureNodes.Nodes.Length];
@@ -279,6 +293,24 @@ namespace FEM
             return psiPsiMatrix;
         }
 
+        public static double[,,] CalcScalarPsiPsiMatrix(int n, QuadratureNodes<double> quadratureNodes, double[,] psiValues)
+        {
+            double[,,] psiPsiMatrix = new double[quadratureNodes.Nodes.Length, n, n];
+
+            for (int k = 0; k < quadratureNodes.Nodes.Length; ++k)
+            {
+                var w = quadratureNodes.Nodes[k].Weight;
+
+                for (int i = 0; i < n; ++i)
+                    for (int j = 0; j < n; ++j)
+                    {
+                        psiPsiMatrix[k, i, j] = w * psiValues[i, k] * psiValues[j, k];
+                    }
+            }
+
+            return psiPsiMatrix;
+        }
+
         public static Vector3D[,] CalcGradValues(int n, QuadratureNodes<Vector3D> quadratureNodes)
         {
             Vector3D[,] gradValues = new Vector3D[n, quadratureNodes.Nodes.Length];
@@ -312,6 +344,20 @@ namespace FEM
                     var node = quadratureNodes.Nodes[j].Node;
                     gradValues[i, j] = new Vector2D(LinearBasisDerivatives.Phi[Mu(i)](node.X) * LinearBasis.Phi[Nu(i)](node.Y),
                                                     LinearBasis.Phi[Mu(i)](node.X) * LinearBasisDerivatives.Phi[Nu(i)](node.Y));
+                }
+
+            return gradValues;
+        }
+
+        public static double[,] CalcGradValues(int n, QuadratureNodes<double> quadratureNodes)
+        {
+            double[,] gradValues = new double[n, quadratureNodes.Nodes.Length];
+
+            for (int i = 0; i < n; ++i)
+                for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
+                {
+                    var node = quadratureNodes.Nodes[j].Node;
+                    gradValues[i, j] = LinearBasisDerivatives.Phi[i](node);
                 }
 
             return gradValues;

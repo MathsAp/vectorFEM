@@ -10,7 +10,10 @@ namespace Quadratures
 
     public enum ElemType
     {
-        Rectangle = 0, Triangle = 1, Cube = 2
+        StraightLine,
+        Rectangle, 
+        Triangle, 
+        Cube
     }
 
     public class QuadratureNode<T>
@@ -38,6 +41,44 @@ namespace Quadratures
 
     public static class NumericalIntegration
     {
+        public static QuadratureNodes<double> FactoryQuadratures1D(int order, ElemType elemType)
+        {
+            IEnumerable<QuadratureNode<double>> q;
+            switch (elemType)
+            {
+                case ElemType.StraightLine:
+                    switch (order)
+                    {
+                        case 3:
+                            {
+                                q = GaussQuadrature1DOrder3();
+                                return new QuadratureNodes<double>(q.ToArray(), 3);
+                            }
+                        case 5:
+                            {
+                                q = GaussQuadrature1DOrder5();
+                                return new QuadratureNodes<double>(q.ToArray(), 5);
+                            }
+                        case 7:
+                            {
+                                q = GaussQuadrature1DOrder7();
+                                return new QuadratureNodes<double>(q.ToArray(), 7);
+                            }
+                        case 9:
+                            {
+                                q = GaussQuadrature1DOrder9();
+                                return new QuadratureNodes<double>(q.ToArray(), 9);
+                            }
+                        default:
+                            throw new Exception("There is no such order.");
+                    }
+
+                default:
+                    throw new Exception("There is no such type of element.");
+
+            }
+        }
+
         public static QuadratureNodes<Vector2D> FactoryQuadratures2D(int order, ElemType elemType)
         {
             IEnumerable<QuadratureNode<Vector2D>> q;
