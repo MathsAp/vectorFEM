@@ -5,7 +5,6 @@ using Quasar.Native;
 
 namespace FEM
 {
-
     public interface IFiniteElement
     {
         ElementType Type { get; }
@@ -99,27 +98,56 @@ namespace FEM
         void Solve(ISolution result);
     }
 
+    public enum MaterialType
+    {
+        Volume,
+        FirstBoundary,
+        SecondBoundary,
+        ThirdBoundary,
+        Interface
+    }
+
     public interface IMaterial
     {
+        MaterialType Type { get; }
+
         bool IsVolume { get; }
         bool Is1 { get; }
         bool Is2 { get; }
-        bool IsInterface {  get; }
-
-        Func<Vector3D, double> Lambda { get; }
-        Func<Vector3D, double> Sigma { get; }
-        Func<Vector3D, double> Epsilon { get; }
-        Func<Vector3D, double> Mu{ get; }
-
-        Func<Vector3D, double, double> Theta { get; }
-        Func<Vector3D, double, Vector3D> Htheta { get; }
-        Func<Vector3D, double, Vector3D> Hext { get; }
-        Func<Vector3D, double, double> Ug { get; }
-        Func<Vector3D, double, Vector3D> Ag { get; }
-        Func<Vector3D, double, double> F { get; }
-        Func<Vector3D, double, Vector3D> Fv { get; }
+        bool Is3 { get; }
+        bool IsInterface { get; }
+        Func<Vector3D, double>? Lambda { get; }
+        Func<Vector3D, double>? Sigma { get; }
+        Func<Vector3D, double>? Epsilon { get; }
+        Func<Vector3D, double>? Mu{ get; }
+        Func<Vector3D, double>? Betta { get; }
+        Func<Vector3D, double, double>? UBetta { get; }
+        Func<Vector3D, double, double>? Theta { get; }
+        Func<Vector3D, double, Vector3D>? Htheta { get; }
+        Func<Vector3D, double, Vector3D>? Hext { get; }
+        Func<Vector3D, double, double>? Ug { get; }
+        Func<Vector3D, double, Vector3D>? Ag { get; }
+        Func<Vector3D, double, double>? F { get; }
+        Func<Vector3D, double, Vector3D>? Fv { get; }
     }
 
+    //public static class MaterialExtensions
+    //{
+    //    public static bool IsVolume(this IMaterial material) =>
+    //        (material.Type & MaterialType.Volume) != 0;
+
+    //    public static bool Is1(this IMaterial material) =>
+    //        (material.Type & MaterialType.FirstBoundary) != 0;
+
+    //    public static bool Is2(this IMaterial material) =>
+    //        (material.Type & MaterialType.SecondBoundary) != 0;
+
+    //    public static bool Is3(this IMaterial material) =>
+    //        (material.Type & MaterialType.ThirdBoundary) != 0;
+
+    //    public static bool IsInterface(this IMaterial material) =>
+    //        (material.Type & MaterialType.) != 0;
+    //}
 
     public interface ISolution
     {

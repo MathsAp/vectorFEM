@@ -3,6 +3,7 @@ using Core.ScalarFiniteElements.FiniteElements2D;
 using Core.ScalarFiniteElements.FiniteElements3D;
 using Core.VectorFiniteElements.FiniteElements2D;
 using Core.VectorFiniteElements.FiniteElements3D;
+using Core2;
 using FEM;
 using Quadratures;
 using System.Runtime.CompilerServices;
@@ -12,10 +13,10 @@ using Constants = Core.Constants;
 using Vector3D = Core.Vector3D;
 
 /* Тестирование расчета плотности тока от обмоток */
-var calculator = new TelmaCoilCalculator();
-await calculator.Load("D:\\Telma\\Telma\\CubeTest\\CubeTest.TelmaProject", "my1");
+//var calculator = new TelmaCoilCalculator();
+//await calculator.Load("D:\\Telma\\Telma\\CubeTest\\CubeTest.TelmaProject", "my1");
 
-Console.WriteLine(calculator.Hext(Vector3D.Zero, 10));
+//Console.WriteLine(calculator.Hext(Vector3D.Zero, 10));
 
 
 // Тестирование интегрирования для нормы
@@ -125,6 +126,8 @@ value *= hx * hy * hz;
 Console.WriteLine($"Value = {Math.Sqrt(value)}");
 
 */
+
+RegularRectangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", RegularRectangularFiniteElementMesh.Dimension.D2);
 
 double func(double x, double y, double z)
 {
@@ -401,16 +404,25 @@ double x0 = 0;
 double y0 = 0;
 
 Func<Vector3D, double, Vector3D> RealHext = (x, t) => (I / (2 * Math.PI)) * new Vector3D(-(x.Y - y0) / ((x.X - x0) * (x.X - x0) + (x.Y - y0) * (x.Y - y0)), (x.X - x0) / ((x.X - x0) * (x.X - x0) + (x.Y - y0) * (x.Y - y0)), 0);
-Func<Vector3D, double, Vector3D> Hext = (x, t) => calculator.Hext(x, t);
+//Func<Vector3D, double, Vector3D> Hext = (x, t) => calculator.Hext(x, t);
 
 // VKR
+//Dictionary<string, IMaterial> Materials = new()
+//{
+//    { "vectorVolume", new Material(true, false, false, false, x => 0, x => 1e6, x => 0, x => Constants.Mu0 * 1000, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "scalarVolume", new Material(true, false, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "1", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
+//    { "interface", new Material(false, false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) }
+//};
+
 Dictionary<string, IMaterial> Materials = new()
 {
-    { "vectorVolume", new Material(true, false, false, false, x => 0, x => 1e6, x => 0, x => Constants.Mu0 * 1000, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "scalarVolume", new Material(true, false, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "1", new Material(false, true, false, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "2", new Material(false, false, true, false, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) },
-    { "interface", new Material(false, false, false, true, x => 0, x => 0, x => 0, x => 0, (x, t) => 0, (x, t) => Vector3D.Zero, Hext, (x, t) => 0, (x, t) => Vector3D.Zero, (x, t) => 0, (x, t) => Vector3D.Zero) }
+    { "vectorVolume", new Material(MaterialType.Volume) },
+    { "scalarVolume", new Material(MaterialType.Volume) },
+    { "1", new Material(MaterialType.FirstBoundary) },
+    { "2", new Material(MaterialType.SecondBoundary) },
+    { "interface", new Material(MaterialType.Interface) }
 };
 
 // Первый тест

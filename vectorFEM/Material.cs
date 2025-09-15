@@ -9,53 +9,47 @@ namespace Core
 {
     public class Material : IMaterial
     {
-        public Material(bool isVolume, bool is1, bool is2, bool isInterface, Func<Vector3D, double> lambda, Func<Vector3D, double> sigma, Func<Vector3D, double> epsilon, Func<Vector3D, double> mu, Func<Vector3D, double, double> theta, Func<Vector3D, double, Vector3D> htheta, Func<Vector3D, double, Vector3D> hext, Func<Vector3D, double, double> ug, Func<Vector3D, double, Vector3D> ag, Func<Vector3D, double, double> f, Func<Vector3D, double, Vector3D> fv)
+        public Material(MaterialType type)
         {
-            IsVolume = isVolume;
-            Is1 = is1;
-            Is2 = is2;
-            IsInterface = isInterface;
-            Lambda = lambda;
-            Sigma = sigma;
-            Epsilon = epsilon;
-            Mu = mu;
-            Theta = theta;
-            Htheta = htheta;
-            Hext = hext;
-            Ug = ug;
-            Ag = ag;
-            F = f;
-            Fv = fv;
+            Type = type;
         }
 
-        public bool IsVolume { get; }
+        public MaterialType Type { get; }
 
-        public bool Is1 { get; }
+        public bool IsVolume => Type is MaterialType.Volume;
 
-        public bool Is2 { get; }
+        public bool Is1 => Type is MaterialType.FirstBoundary;
 
-        public bool IsInterface { get; }
+        public bool Is2 => Type is MaterialType.SecondBoundary;
 
-        public Func<Vector3D, double> Lambda { get; }
+        public bool Is3 => Type is MaterialType.ThirdBoundary;
 
-        public Func<Vector3D, double> Sigma { get; }
+        public bool IsInterface => Type is MaterialType.Interface;
 
-        public Func<Vector3D, double> Epsilon { get; }
+        public Func<Vector3D, double>? Lambda { get; init; }
 
-        public Func<Vector3D, double> Mu { get; }
+        public Func<Vector3D, double>? Sigma { get; init; }
 
-        public Func<Vector3D, double, double> Theta { get; }
+        public Func<Vector3D, double>? Epsilon { get; init; }
 
-        public Func<Vector3D, double, Vector3D> Htheta { get; }
+        public Func<Vector3D, double>? Mu { get; init; }
 
-        public Func<Vector3D, double, Vector3D> Hext { get; }
+        public Func<Vector3D, double>? Betta { get; init; }
 
-        public Func<Vector3D, double, double> Ug { get; }
+        public Func<Vector3D, double, double>? UBetta { get; init; }
 
-        public Func<Vector3D, double, Vector3D> Ag { get; }
+        public Func<Vector3D, double, double>? Theta { get; init; }
 
-        public Func<Vector3D, double, double> F { get; }
+        public Func<Vector3D, double, Vector3D>? Htheta { get; init; }
 
-        public Func<Vector3D, double, Vector3D> Fv { get; }
+        public Func<Vector3D, double, Vector3D>? Hext { get; init; }
+
+        public Func<Vector3D, double, double>? Ug { get; init; }
+
+        public Func<Vector3D, double, Vector3D>? Ag { get; init; }
+
+        public Func<Vector3D, double, double>? F { get; init; }
+
+        public Func<Vector3D, double, Vector3D>? Fv { get; init; }
     }
 }

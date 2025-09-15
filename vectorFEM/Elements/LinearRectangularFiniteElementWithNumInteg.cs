@@ -1,6 +1,8 @@
-﻿using FEM;
+﻿using Core.FiniteElements2D;
+using FEM;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -272,21 +274,90 @@ namespace Core
 
                 }
 
-                
-
                 public Vector3D GetGradientAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    Vector3D a = VertexCoords[VertexNumber[0]];
+                    Vector3D b = VertexCoords[VertexNumber[1]];
+                    Vector3D c = VertexCoords[VertexNumber[2]];
+                    Vector3D d = VertexCoords[VertexNumber[3]];
+
+                    double hx = a.Distance(b);
+                    double hy = a.Distance(c);
+
+                    double xi = (point.X - a.X) / hx;
+                    double eta = (point.Y - a.Y) / hy;
+
+                    int Mu(int i) => LinearRectangularFiniteElement.Mu(i);
+                    int Nu(int i) => LinearRectangularFiniteElement.Nu(i);
+
+                    double xValue = 0;
+                    double yValue = 0;
+                    double coeff = 0;
+                    int N = Dofs.Length;
+                    for (int i = 0; i < N; ++i)
+                    {
+                        coeff = coeffs[Dofs[i]];
+
+                        xValue += coeff * (1 / hx) * LinearBasisDerivatives.Phi[Mu(i)](xi) * LinearBasis.Phi[Nu(i)](eta);
+                        yValue += coeff * LinearBasis.Phi[Mu(i)](xi) * (1 / hy) * LinearBasisDerivatives.Phi[Nu(i)](eta);
+                    }
+
+                    return new(xValue, yValue, 0);
                 }
 
                 public double GetValueAtPoint(Vector3D[] VertexCoords, ReadOnlySpan<double> coeffs, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    Vector3D a = VertexCoords[VertexNumber[0]];
+                    Vector3D b = VertexCoords[VertexNumber[1]];
+                    Vector3D c = VertexCoords[VertexNumber[2]];
+                    Vector3D d = VertexCoords[VertexNumber[3]];
+
+                    double hx = a.Distance(b);
+                    double hy = a.Distance(c);
+
+                    double xi = (point.X - a.X) / hx;
+                    double eta = (point.Y - a.Y) / hy;
+
+                    int Mu(int i) => LinearRectangularFiniteElement.Mu(i);
+                    int Nu(int i) => LinearRectangularFiniteElement.Nu(i);
+
+                    double value = 0;
+                    int N = Dofs.Length;
+                    for (int i = 0; i < N; ++i)
+                    {
+                        value += coeffs[Dofs[i]] * LinearBasis.Phi[Mu(i)](xi) * LinearBasis.Phi[Nu(i)](eta); 
+                    }
+
+                    return value;
                 }
 
                 public bool IsPointOnElement(Vector3D[] VertexCoords, Vector3D point)
                 {
-                    throw new NotImplementedException();
+                    Vector3D a = VertexCoords[VertexNumber[0]];
+                    Vector3D b = VertexCoords[VertexNumber[1]];
+                    Vector3D c = VertexCoords[VertexNumber[2]];
+                    Vector3D d = VertexCoords[VertexNumber[3]];
+
+                    Vector3D dx = b - a;
+                    double hx = dx.Norm;
+                    dx /= hx;
+                    Vector3D dy = c - a;
+                    double hy = dy.Norm;
+                    dy /= hy;
+
+                    Vector3D n = Vector3D.Cross(dx, dy);
+                    n /= n.Norm;
+
+                    Vector3D pa = point - a;
+
+                    if (Math.Abs(pa * n) > Constants.GeometryEps) return false;
+
+                    double s = pa * dx / hx;
+                    if (s < 0 || s > 1) return false;
+                    double t = pa * dy / hy;
+                    if (t < 0 || t > 1) return false;
+
+                    return true;
                 }
                 public double[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, double> LocalFunc, Quadratures.QuadratureNode<Vector2D>[] nodes)
                 {
