@@ -1,0 +1,49 @@
+1
+name 3 2
+Lambda
+p.X + p.Y + p.Z
+F
+p.X * p.Y * p.Z + t
+
+
+n (количество материалов, должно совпадать с файлом materials.txt)
+имя_материала_1 тип_материала количество_функций
+имя_функции_1 
+тело_функции_1
+...
+имя_функции_количество_функций 
+тело_функции_количество_функций
+имя_материала_2 тип_материала количество_функций
+...
+имя_материала_n тип_материала количество_функций
+...
+
+Типы материала:
+1 - Volume
+2 - FirstBoundary
+3 - SecondBoundary
+4 - ThirdBoundary
+5 - Interface
+
+Имена параметров в функциях:
+Vector3D - p, double - t (если задача стационарная или задаваемая функция не зависит от t, то просто проигнорируйте его в выражении)
+Для двумерного случая использовать p.X и p.Y, 
+для трехмерного p.X, p.Y, p.Z
+
+Не содержат t
+Func<Vector3D, double> Lambda
+Func<Vector3D, double> Sigma
+Func<Vector3D, double> Epsilon
+Func<Vector3D, double> Mu
+Func<Vector3D, double> Betta - коэффициент третьего краевого
+
+Содержат t
+Func<Vector3D, double, double> UBetta - третье краевое
+Func<Vector3D, double, double> Theta - второе краевое
+Func<Vector3D, double, double> Ug - первое краевое
+Func<Vector3D, double, double> F - правая часть скалярного уравнения
+
+Func<Vector3D, double, Vector3D> Htheta - второе векторное краевое
+Func<Vector3D, double, Vector3D> Hext - поле от внешнего тока
+Func<Vector3D, double, Vector3D> Ag - первое векторное краевое
+Func<Vector3D, double, Vector3D> Fv - правая часть векторного уравнения

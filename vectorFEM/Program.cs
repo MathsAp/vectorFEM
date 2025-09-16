@@ -4,6 +4,7 @@ using Core.ScalarFiniteElements.FiniteElements3D;
 using Core.VectorFiniteElements.FiniteElements2D;
 using Core.VectorFiniteElements.FiniteElements3D;
 using Core2;
+using DynamicData.Aggregation;
 using FEM;
 using Quadratures;
 using System.Runtime.CompilerServices;
@@ -137,6 +138,16 @@ double func(double x, double y, double z)
 QuadratureNodes<Vector3D> QuadratureNodes;
 
 QuadratureNodes = NumericalIntegration.FactoryQuadratures3D(9, ElemType.Cube);
+
+IDictionary<string, IMaterial> mats = MaterialsFactory.CreateMaterials("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
+
+
+//Material mat = new(MaterialType.Volume);
+//mat.UBetta = (p, t) => p.Norm + t;
+
+//IMaterial imat = mat;
+
+Console.WriteLine($"{mats["name"].Lambda(new(1, 2, 3))}, {mats["name"].F(new(1, 2, 3), 10)}");
 
 double x00 = 2;
 double x1 = -1;

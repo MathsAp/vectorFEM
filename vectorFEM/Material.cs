@@ -26,30 +26,30 @@ namespace Core
 
         public bool IsInterface => Type is MaterialType.Interface;
 
-        public Func<Vector3D, double>? Lambda { get; init; }
+        public Func<Vector3D, double>? Lambda { get; set; }
 
-        public Func<Vector3D, double>? Sigma { get; init; }
+        public Func<Vector3D, double>? Sigma { get; set; }
 
-        public Func<Vector3D, double>? Epsilon { get; init; }
+        public Func<Vector3D, double>? Epsilon { get; set; }
 
-        public Func<Vector3D, double>? Mu { get; init; }
+        public Func<Vector3D, double>? Mu { get; set; }
 
-        public Func<Vector3D, double>? Betta { get; init; }
+        public Func<Vector3D, double>? Betta { get; set; }
 
-        public Func<Vector3D, double, double>? UBetta { get; init; }
+        public Func<Vector3D, double, double>? UBetta { get; set; }
 
-        public Func<Vector3D, double, double>? Theta { get; init; }
+        public Func<Vector3D, double, double>? Theta { get; set; }
 
-        public Func<Vector3D, double, Vector3D>? Htheta { get; init; }
+        public Func<Vector3D, double, Vector3D>? Htheta { get; set; }
 
-        public Func<Vector3D, double, Vector3D>? Hext { get; init; }
+        public Func<Vector3D, double, Vector3D>? Hext { get; set; }
 
-        public Func<Vector3D, double, double>? Ug { get; init; }
+        public Func<Vector3D, double, double>? Ug { get; set; }
 
-        public Func<Vector3D, double, Vector3D>? Ag { get; init; }
+        public Func<Vector3D, double, Vector3D>? Ag { get; set; }
 
-        public Func<Vector3D, double, double>? F { get; init; }
+        public Func<Vector3D, double, double>? F { get; set; }
 
-        public Func<Vector3D, double, Vector3D>? Fv { get; init; }
-    }
+        public Func<Vector3D, double, Vector3D>? Fv { get; set; }
+    }   
 }

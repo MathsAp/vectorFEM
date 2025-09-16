@@ -100,7 +100,7 @@ namespace FEM
 
     public enum MaterialType
     {
-        Volume,
+        Volume = 1,
         FirstBoundary,
         SecondBoundary,
         ThirdBoundary,
