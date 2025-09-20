@@ -5,80 +5,79 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core
+namespace Core;
+
+public class EllipticProblem : IProblem
 {
-    public class EllipticProblem : IProblem
+    public EllipticProblem(IFiniteElementMesh mesh, IDictionary<string, IMaterial> materials) 
     {
-        public EllipticProblem(IFiniteElementMesh mesh, IDictionary<string, IMaterial> materials) 
+        Materials = materials;
+        Mesh = mesh;
+    }
+
+    public IDictionary<string, IMaterial> Materials { get; }
+    public IFiniteElementMesh Mesh { get; }
+
+    PardisoSLAE? SLAE { get; set; }
+
+    public void Prepare()
+    {
+        FemAlgorithms.EnumerateMeshDofs(Mesh);
+        SLAE = new PardisoSLAE(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+    }
+
+    public void Solve(ISolution result)
+    {
+
+        Parallel.ForEach(Mesh.Elements, element =>
         {
-            Materials = materials;
-            Mesh = mesh;
+            var material = Materials[element.Material];
+
+            if (material.IsVolume)
+            {
+                var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, material.Lambda);
+                SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
+                SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                var LRP = element.BuildLocalRightPart(Mesh.Vertex, Coeff => material.F(Coeff, 1));
+                SLAE?.AddLocalRightPart(element.Dofs, LRP);
+            }
+            else if (material.Is2)
+            {
+                var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Theta(Coeff, 1));
+                SLAE?.AddLocalRightPart(element.Dofs, LRP);
+            }
+            else if (material.Is3)
+            {
+                var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Betta);
+                SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Betta(Coeff) * material.UBetta(Coeff, 1));
+                SLAE?.AddLocalRightPart(element.Dofs, LRP);
+            }
+        }
+        );
+
+        foreach(var element in Mesh.Elements)
+        {
+            var material = Materials[element.Material];
+
+            if (material.Is1)
+            {
+                var LRP = element.BuildLocalRightPartWithFirstBoundaryConditions(Mesh.Vertex, Coeff => material.Ug(Coeff, 1));
+                SLAE?.AddFirstBoundaryConditions(element.Dofs, LRP);
+            }
         }
 
-        public IDictionary<string, IMaterial> Materials { get; }
-        public IFiniteElementMesh Mesh { get; }
-
-        PardisoSLAE? SLAE { get; set; }
-
-        public void Prepare()
+        using (PardisoSLAESolver solver = new PardisoSLAESolver(SLAE!))
         {
-            FemAlgorithms.EnumerateMeshDofs(Mesh);
-            SLAE = new PardisoSLAE(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
-        }
+            solver.Prepare();
 
-        public void Solve(ISolution result)
-        {
+            var solutionVector = solver.Solve();
 
-            Parallel.ForEach(Mesh.Elements, element =>
-            {
-                var material = Materials[element.Material];
-
-                if (material.IsVolume)
-                {
-                    var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, material.Lambda);
-                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
-
-                    LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
-                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
-
-                    var LRP = element.BuildLocalRightPart(Mesh.Vertex, Coeff => material.F(Coeff, 1));
-                    SLAE?.AddLocalRightPart(element.Dofs, LRP);
-                }
-                else if (material.Is2)
-                {
-                    var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Theta(Coeff, 1));
-                    SLAE?.AddLocalRightPart(element.Dofs, LRP);
-                }
-                else if (material.Is3)
-                {
-                    var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Betta);
-                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
-
-                    var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Betta(Coeff) * material.UBetta(Coeff, 1));
-                    SLAE?.AddLocalRightPart(element.Dofs, LRP);
-                }
-            }
-            );
-
-            foreach(var element in Mesh.Elements)
-            {
-                var material = Materials[element.Material];
-
-                if (material.Is1)
-                {
-                    var LRP = element.BuildLocalRightPartWithFirstBoundaryConditions(Mesh.Vertex, Coeff => material.Ug(Coeff, 1));
-                    SLAE?.AddFirstBoundaryConditions(element.Dofs, LRP);
-                }
-            }
-
-            using (PardisoSLAESolver solver = new PardisoSLAESolver(SLAE!))
-            {
-                solver.Prepare();
-
-                var solutionVector = solver.Solve();
-
-                result.AddSolutionVector(1, solutionVector);
-            }
+            result.AddSolutionVector(1, solutionVector);
         }
     }
 }

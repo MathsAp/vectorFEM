@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core
+namespace Core;
+
+public static class Constants
 {
-    public static class Constants
-    {
-        public static double Mu0 => 4 * Math.PI * 1e-7;
-        public static double Pi => Math.PI;
-        public const double GeometryEps = 1e-8;
-    }
+    public static double Mu0 => 4 * Math.PI * 1e-7;
+    public static double Pi => Math.PI;
+    public const double GeometryEps = 1e-8;
 }

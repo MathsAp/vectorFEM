@@ -4,10 +4,9 @@ using Core.ScalarFiniteElements.FiniteElements2D;
 using Core.ScalarFiniteElements.FiniteElements3D;
 using Core.VectorFiniteElements.FiniteElements2D;
 using Core.VectorFiniteElements.FiniteElements3D;
-using Core2;
 using DynamicData.Aggregation;
 using FEM;
-using Quadratures;
+using Core.Quadratures;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -651,8 +650,8 @@ Func<Vector3D, double, Vector3D> graduReal = (p, t) => new(1 + t * p.Y, 1 + t * 
 IDictionary<string, IMaterial> materials = MaterialsFactory.CreateMaterials(path);
 (ITimeMesh tMesh, Func<Vector3D, double> initFunc) = TimeMeshFactory<double>.CreateTimeMesh(path);
 
-//ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
-ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+//ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
 //ParabolicProblem problem = new(mesh2, tMesh, initFunc, materials);
 //EllipticProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), materials);
 problem.Prepare();

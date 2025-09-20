@@ -18,7 +18,7 @@ public static class TimeMeshFactory<T>
 
     public static (ITimeMesh TimeMesh, Func<Vector3D, T> InitialFunction) CreateTimeMesh(string path)
     {
-        if (!Path.Exists(path)) throw new ArgumentException("The path is incorrect");
+        if (!Path.Exists(path)) throw new ArgumentException("The path is incorrect", nameof(path));
 
         using var reader = new StreamReader(Path.Combine(path, "time.txt"));
 

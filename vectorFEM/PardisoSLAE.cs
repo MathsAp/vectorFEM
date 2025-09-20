@@ -6,45 +6,43 @@ using System.Threading.Tasks;
 using FEM;
 using Quasar.Native;
 
-namespace Core
+namespace Core;
+
+public class PardisoSLAE : ISLAE
 {
-    public class PardisoSLAE : ISLAE
+    public PardisoSLAE(IMatrix matrix)
     {
-        public PardisoSLAE(IMatrix matrix)
-        {
-            Matrix = matrix;
+        Matrix = matrix;
 
-            RightPart = new double[Matrix.N];
-        }
-
-        public IMatrix Matrix { get; }
-
-        public void AddLocalRightPart(int[] dofs, double[] lrp)
-        {
-            for (int i = 0; i < dofs.Length; ++i)
-                LinqExtensions.ThreadSafeAdd(RightPart, dofs[i], lrp[i]);
-        }
-
-        public void AddFirstBoundaryConditions(int[] dofs, double[] lrp)
-        {
-            for (int i = 0; i < dofs.Length; ++i)
-            {
-                double value = lrp[i];
-                LinqExtensions.ThreadSafeSet(RightPart, dofs[i], value);
-                Matrix.Symmetrize(dofs[i], value, RightPart);
-            }
-        }
-        public void Clear()
-        {
-            Matrix.Clear();
-            ClearRightPart();
-        }
-        public void ClearRightPart()
-        {
-            Array.Clear(RightPart, 0, RightPart.Length);
-        }
-        public double[] RightPart { get; }
-
+        RightPart = new double[Matrix.N];
     }
+
+    public IMatrix Matrix { get; }
+
+    public void AddLocalRightPart(int[] dofs, double[] lrp)
+    {
+        for (int i = 0; i < dofs.Length; ++i)
+            LinqExtensions.ThreadSafeAdd(RightPart, dofs[i], lrp[i]);
+    }
+
+    public void AddFirstBoundaryConditions(int[] dofs, double[] lrp)
+    {
+        for (int i = 0; i < dofs.Length; ++i)
+        {
+            double value = lrp[i];
+            LinqExtensions.ThreadSafeSet(RightPart, dofs[i], value);
+            Matrix.Symmetrize(dofs[i], value, RightPart);
+        }
+    }
+    public void Clear()
+    {
+        Matrix.Clear();
+        ClearRightPart();
+    }
+    public void ClearRightPart()
+    {
+        Array.Clear(RightPart, 0, RightPart.Length);
+    }
+    public double[] RightPart { get; }
 
 }

@@ -37,10 +37,10 @@ public class TimeMesh : ITimeMesh
         int n = baseTimeMesh.Length;
 
         if (n - 1 != refParams.splitCount.Count)
-            throw new ArgumentException("Количество интервалов в базовой временной сетке не совпадает с количеством интервалов для разбиения.");
+            throw new ArgumentException("Количество интервалов в базовой временной сетке не совпадает с количеством интервалов для разбиения.", nameof(refParams));
 
         if (n - 1 != refParams.stretchRatio.Count)
-            throw new ArgumentException("Количество интервалов в базовой временной сетке не совпадает с количеством коэффициентов для разбиения.");
+            throw new ArgumentException("Количество интервалов в базовой временной сетке не совпадает с количеством коэффициентов для разбиения.", nameof(refParams));
 
         baseT = baseTimeMesh;
         refineParams = refParams;
@@ -68,7 +68,7 @@ public class TimeMesh : ITimeMesh
             case 2:
                 return Coeffs[1];
             default:
-                throw new ArgumentException();
+                throw new ArgumentException(nameof(i));
         }
     }
 
