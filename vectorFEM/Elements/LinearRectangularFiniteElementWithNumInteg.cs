@@ -359,6 +359,7 @@ namespace Core
 
                     return true;
                 }
+
                 public double[] CalcLocalFuncInQuadratureNodes(Func<Vector2D, double> LocalFunc, Quadratures.QuadratureNode<Vector2D>[] nodes)
                 {
                     double[] values = new double[nodes.Length];

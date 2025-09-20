@@ -126,7 +126,7 @@ namespace Quadratures
                         case 6:
                             {
                                 q = GaussQuadratureTriangleOrder6();
-                                return new QuadratureNodes<Vector2D>(q.ToArray(), 5);
+                                return new QuadratureNodes<Vector2D>(q.ToArray(), 6);
                             }
                         default:
                             throw new Exception("There is no such order");

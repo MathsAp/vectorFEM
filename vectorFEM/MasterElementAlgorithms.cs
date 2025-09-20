@@ -134,7 +134,7 @@ namespace FEM
             return psiValues;
         }
 
-        public static double[,] CalcScalarPsiValues(int n, QuadratureNodes<Vector2D> quadratureNodes)
+        public static double[,] CalcScalarPsiValues(int n, QuadratureNodes<Vector2D> quadratureNodes, bool isTriangle = false)
         {
             double[,] psiValues = new double[n, quadratureNodes.Nodes.Length];
 
@@ -146,21 +146,24 @@ namespace FEM
                 for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
                 {
                     var node = quadratureNodes.Nodes[j].Node;
-                    psiValues[i, j] = LinearBasis.Phi[Mu(i)](node.X) * LinearBasis.Phi[Nu(i)](node.Y);
+                    psiValues[i, j] = isTriangle ? TrianglesQuadraticBasis.Phi[i](node)
+                        : LinearBasis.Phi[Mu(i)](node.X) * LinearBasis.Phi[Nu(i)](node.Y);
                 }
 
             return psiValues;
         }
 
-        public static double[,] CalcScalarPsiValues(int n, QuadratureNodes<double> quadratureNodes)
+        public static double[,] CalcScalarPsiValues(int n, QuadratureNodes<double> quadratureNodes, bool isQuadratic = false)
         {
             double[,] psiValues = new double[n, quadratureNodes.Nodes.Length];
+
+            var phi = isQuadratic ? QuadraticBasis.Phi : LinearBasis.Phi;
 
             for (int i = 0; i < n; ++i)
                 for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
                 {
                     var node = quadratureNodes.Nodes[j].Node;
-                    psiValues[i, j] = LinearBasis.Phi[i](node);
+                    psiValues[i, j] = phi[i](node);
                 }
 
             return psiValues;
@@ -331,7 +334,7 @@ namespace FEM
             return gradValues;
         }
 
-        public static Vector2D[,] CalcGradValues(int n, QuadratureNodes<Vector2D> quadratureNodes)
+        public static Vector2D[,] CalcGradValues(int n, QuadratureNodes<Vector2D> quadratureNodes, bool isTriangle = false)
         {
             Vector2D[,] gradValues = new Vector2D[n, quadratureNodes.Nodes.Length];
 
@@ -342,22 +345,25 @@ namespace FEM
                 for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
                 {
                     var node = quadratureNodes.Nodes[j].Node;
-                    gradValues[i, j] = new Vector2D(LinearBasisDerivatives.Phi[Mu(i)](node.X) * LinearBasis.Phi[Nu(i)](node.Y),
-                                                    LinearBasis.Phi[Mu(i)](node.X) * LinearBasisDerivatives.Phi[Nu(i)](node.Y));
+                    gradValues[i, j] = isTriangle ? TrianglesQuadraticBasisGradients.Phi[i](node)
+                        : new Vector2D(LinearBasisDerivatives.Phi[Mu(i)](node.X) * LinearBasis.Phi[Nu(i)](node.Y),
+                                       LinearBasis.Phi[Mu(i)](node.X) * LinearBasisDerivatives.Phi[Nu(i)](node.Y));
                 }
 
             return gradValues;
         }
 
-        public static double[,] CalcGradValues(int n, QuadratureNodes<double> quadratureNodes)
+        public static double[,] CalcGradValues(int n, QuadratureNodes<double> quadratureNodes, bool isQuadratic = false)
         {
             double[,] gradValues = new double[n, quadratureNodes.Nodes.Length];
+
+            var phi = isQuadratic ? QuadraticBasisDerivatives.Phi : LinearBasisDerivatives.Phi;
 
             for (int i = 0; i < n; ++i)
                 for (int j = 0; j < quadratureNodes.Nodes.Length; ++j)
                 {
                     var node = quadratureNodes.Nodes[j].Node;
-                    gradValues[i, j] = LinearBasisDerivatives.Phi[i](node);
+                    gradValues[i, j] = phi[i](node);
                 }
 
             return gradValues;

@@ -186,4 +186,76 @@ namespace FEM
 
         public static LineSegmentMasterElementLinearScalarBasis GetInstance() => Instance.Value;
     }
+
+    public class LineSegmentMasterElementQuadraticScalarBasis : IMasterElement<double, double, double>
+    {
+        private LineSegmentMasterElementQuadraticScalarBasis()
+        {
+            int n = 3;
+            int order = 7;
+
+            QuadratureNodes = NumericalIntegration.FactoryQuadratures1D(order, ElemType.StraightLine);
+            PsiValues = MasterElementAlgorithms.CalcScalarPsiValues(n, QuadratureNodes, true);
+            PsiPsiMatrix = MasterElementAlgorithms.CalcScalarPsiPsiMatrix(n, QuadratureNodes, PsiValues);
+            GradValues = MasterElementAlgorithms.CalcGradValues(n, QuadratureNodes, true);
+        }
+
+        private static Lazy<LineSegmentMasterElementQuadraticScalarBasis> Instance { get; } = new(() => new LineSegmentMasterElementQuadraticScalarBasis());
+
+        public double[,] PsiValues { get; }
+
+        public double[,,] FacesPsiValues => throw new NotImplementedException();
+
+        public double[,,] FacesPsiNValues => throw new NotImplementedException();
+
+        public double[,,] FacesGradValues => throw new NotImplementedException();
+
+        public double[,,] PsiPsiMatrix { get; }
+
+        public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
+        public double[,] CurlValues => throw new NotImplementedException();
+
+        public double[,] GradValues { get; }
+
+        public QuadratureNodes<double> QuadratureNodes { get; }
+
+        public static LineSegmentMasterElementQuadraticScalarBasis GetInstance() => Instance.Value;
+    }
+
+    public class TriangularMasterElementQuadraticScalarBasis : IMasterElement<Vector2D, double, double>
+    {
+        private TriangularMasterElementQuadraticScalarBasis()
+        {
+            int n = 6;
+            int order = 6;
+
+            QuadratureNodes = NumericalIntegration.FactoryQuadratures2D(order, ElemType.Triangle);
+            PsiValues = MasterElementAlgorithms.CalcScalarPsiValues(n, QuadratureNodes, true);
+            PsiPsiMatrix = MasterElementAlgorithms.CalcScalarPsiPsiMatrix(n, QuadratureNodes, PsiValues);
+            GradValues = MasterElementAlgorithms.CalcGradValues(n, QuadratureNodes, true);
+        }
+
+        private static Lazy<TriangularMasterElementQuadraticScalarBasis> Instance { get; } = new(() => new TriangularMasterElementQuadraticScalarBasis());
+
+        public double[,] PsiValues { get; }
+
+        public double[,,] FacesPsiValues => throw new NotImplementedException();
+
+        public double[,,] FacesPsiNValues => throw new NotImplementedException();
+
+        public double[,,] FacesGradValues => throw new NotImplementedException();
+
+        public double[,,] PsiPsiMatrix { get; }
+
+        public double[,,,] FacesPsiNPsiNMatrix => throw new NotImplementedException();
+
+        public double[,] CurlValues => throw new NotImplementedException();
+
+        public Vector2D[,] GradValues { get; }
+
+        public QuadratureNodes<Vector2D> QuadratureNodes { get; }
+
+        public static TriangularMasterElementQuadraticScalarBasis GetInstance() => Instance.Value;
+    }
 }

@@ -18,10 +18,10 @@ namespace Core2
     {
         public RegularRectangularFiniteElementMesh(string path, Dimension dim)
         {
+            if (!Directory.Exists(path)) throw new ArgumentException("The path to the mesh folder is incorrect", nameof(path));
+
             this.path = path;
             this.dim = dim;
-
-            if (!Path.Exists(path)) throw new ArgumentException("The path to the mesh folder is incorrect");
 
             materialNumbers = GetMaterialNumbers();
 

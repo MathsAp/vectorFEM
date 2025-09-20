@@ -6,20 +6,27 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using FEM;
+using static FEM.IProblem;
 
 namespace Core
 {
     public class ParabolicProblem : IProblem
     {
-
-        public ParabolicProblem(IFiniteElementMesh mesh, ITimeMesh timeMesh, Func<Vector3D, double> initCondition, IDictionary<string, IMaterial> materials)
+        public ParabolicProblem(
+            IFiniteElementMesh mesh, 
+            ITimeMesh timeMesh, 
+            Func<Vector3D, double> initCondition, 
+            IDictionary<string, IMaterial> materials, 
+            CoordinateSystem system = CoordinateSystem.Cartesian)
         {
             Mesh = mesh;
             TimeMesh = timeMesh;
             InitialCondition = initCondition;
             Materials = materials;
+            this.system = system;
         }
 
+        CoordinateSystem system;
         public IDictionary<string, IMaterial> Materials { get; }
         public IFiniteElementMesh Mesh { get; }
         public ITimeMesh TimeMesh { get; }
@@ -31,6 +38,7 @@ namespace Core
         {
             FemAlgorithms.EnumerateMeshDofs(Mesh);
             SLAE = new PardisoSLAE(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+            //SLAE = new(new PardisoNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.StructurallySymmetric));
             TimeMesh.ChangeCoefs(GetWeightsForInitialCondition());
         }
 
@@ -72,6 +80,8 @@ namespace Core
             int tN = TimeMesh.Size();
             double[] timeCoefs = new double[3];
 
+            //Func<Vector3D, Vector3D>? velocity = p => new(p.Y / p.X, p.X, 0);
+            Func<Vector3D, Vector3D>? velocity = null;
             PardisoSLAESolver? SLAESolver = null;
 
             for (int iT = 1; iT < tN; ++iT)
@@ -108,16 +118,25 @@ namespace Core
                 //foreach (var element in Mesh.Elements)
                 {
                     var material = Materials[element.Material];
-
+                    Func<Vector3D, double> coeff;
                     if (material.IsVolume)
                     {
-
-                        var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, material.Lambda);
+                        coeff = system is CoordinateSystem.Cylindrical ? p => p.X * material.Lambda!(p) : material.Lambda!;
+                        var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Stiffness, coeff);
                         SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
 
-                        LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Sigma);
+                        coeff = system is CoordinateSystem.Cylindrical ? p => p.X * material.Sigma!(p) : material.Sigma!;
+                        if (velocity is not null)
+                        {
+                            LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Convection, coeff, velocity);
+                            SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+                        }
 
-                        var LRP = element.BuildLocalRightPart(Mesh.Vertex, Coeff => material.F(Coeff, t));
+                        //coeff = system is CoordinateSystem.Cylindrical ? p => p.X * material.Sigma!(p) : material.Sigma!;
+                        LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, coeff);
+
+                        coeff = system is CoordinateSystem.Cylindrical ? p => p.X * material.F!(p, t) : p => material.F!(p, t);
+                        var LRP = element.BuildLocalRightPart(Mesh.Vertex, coeff);
                         SLAE?.AddLocalRightPart(element.Dofs, LRP);
 
 
@@ -132,7 +151,18 @@ namespace Core
                     }
                     else if (material.Is2)
                     {
-                        var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Theta(Coeff, t));
+                        coeff = system is CoordinateSystem.Cylindrical ? p => p.X * material.Theta!(p, t) : p => material.Theta!(p, t);
+                        var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, coeff);
+                        SLAE?.AddLocalRightPart(element.Dofs, LRP);
+                    }
+                    else if (material.Is3)
+                    {
+                        Func<Vector3D, double> betta = system is CoordinateSystem.Cylindrical ? p => p.X * material.Betta!(p) : material.Betta!;
+                        var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, betta);
+                        SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                        coeff = p => betta(p) * material.UBetta!(p, t);
+                        var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, coeff);
                         SLAE?.AddLocalRightPart(element.Dofs, LRP);
                     }
                 }
@@ -144,7 +174,7 @@ namespace Core
 
                     if (material.Is1)
                     {
-                        var LRP = element.BuildLocalRightPartWithFirstBoundaryConditions(Mesh.Vertex, Coeff => material.Ug(Coeff, t));
+                        var LRP = element.BuildLocalRightPartWithFirstBoundaryConditions(Mesh.Vertex, Coeff => material.Ug!(Coeff, t));
                         SLAE?.AddFirstBoundaryConditions(element.Dofs, LRP);
                     }
                 }

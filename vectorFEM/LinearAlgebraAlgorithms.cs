@@ -120,7 +120,7 @@ namespace Core
             return new Vector3D(result);
         }
 
-        public static Vector2D MultiplyMatrix2By2ByVector(double[,] matrix, Vector2D vector, double coeff = 1d)
+        public static Vector2D MultiplyMatrix2By2ByVector(double[,] matrix, Vector2D vector, double coeff = 1d, bool transpose = false)
         {
             int rows = matrix.GetLength(0);
             int cols = matrix.GetLength(1);
@@ -137,13 +137,38 @@ namespace Core
                 double sum = 0;
                 for (int j = 0; j < cols; ++j)
                 {
-                    sum += matrix[i, j] * vector[j];
+                    sum += (transpose ? matrix[j, i] : matrix[i, j]) * vector[j];
                 }
 
                 result[i] = coeff * sum;
             }
 
             return new Vector2D(result);
+        }
+
+        public static double[,] GetMatrixMultipliedByTransposedMatrix(double[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+
+            double[,] result = new double[rows, rows];
+
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = i; j < rows; ++j)
+                {
+                    double sum = 0;
+                    for (int k = 0; k < cols; ++k)
+                    {
+                        sum += matrix[i, k] * matrix[j, k];
+                    }
+
+                    result[i, j] = sum;
+                    result[j, i] = sum;
+                }
+            }
+
+            return result;
         }
 
         public static void PrintMatrix(double[,] matrix)

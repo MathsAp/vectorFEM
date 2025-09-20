@@ -49,6 +49,14 @@ namespace Core
                     var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Theta(Coeff, 1));
                     SLAE?.AddLocalRightPart(element.Dofs, LRP);
                 }
+                else if (material.Is3)
+                {
+                    var LM = element.BuildLocalMatrix(Mesh.Vertex, IFiniteElement.MatrixType.Mass, material.Betta);
+                    SLAE?.Matrix.AddLocal(element.Dofs, element.Dofs, LM);
+
+                    var LRP = element.BuildLocalRightPartWithSecondBoundaryConditions(Mesh.Vertex, Coeff => material.Betta(Coeff) * material.UBetta(Coeff, 1));
+                    SLAE?.AddLocalRightPart(element.Dofs, LRP);
+                }
             }
             );
 

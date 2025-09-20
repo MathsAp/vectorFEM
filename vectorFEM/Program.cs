@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.ScalarFiniteElements.FiniteElements1D;
 using Core.ScalarFiniteElements.FiniteElements2D;
 using Core.ScalarFiniteElements.FiniteElements3D;
 using Core.VectorFiniteElements.FiniteElements2D;
@@ -7,11 +8,16 @@ using Core2;
 using DynamicData.Aggregation;
 using FEM;
 using Quadratures;
+using System.Drawing;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using TelmaQuasarCommon;
 using TelmaQuasarCommon.Core.BasisFunction;
 using Constants = Core.Constants;
 using Vector3D = Core.Vector3D;
+
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 /* Тестирование расчета плотности тока от обмоток */
 //var calculator = new TelmaCoilCalculator();
@@ -139,7 +145,7 @@ QuadratureNodes<Vector3D> QuadratureNodes;
 
 QuadratureNodes = NumericalIntegration.FactoryQuadratures3D(9, ElemType.Cube);
 
-IDictionary<string, IMaterial> mats = MaterialsFactory.CreateMaterials("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
+//IDictionary<string, IMaterial> mats = MaterialsFactory.CreateMaterials("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
 
 
 //Material mat = new(MaterialType.Volume);
@@ -147,7 +153,11 @@ IDictionary<string, IMaterial> mats = MaterialsFactory.CreateMaterials("C:\\User
 
 //IMaterial imat = mat;
 
-Console.WriteLine($"{mats["name"].Lambda(new(1, 2, 3))}, {mats["name"].F(new(1, 2, 3), 10)}");
+//Console.WriteLine($"{mats["name"].Lambda(new(1, 2, 3))}, {mats["name"].F(new(1, 2, 3), 10)}");
+
+//(ITimeMesh tm, Func<Vector3D, double> initFunc) = TimeMeshFactory<double>.CreateTimeMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
+
+//Console.WriteLine(initFunc(new(1, 2, 3)));
 
 double x00 = 2;
 double x1 = -1;
@@ -375,7 +385,7 @@ Dictionary<int, string> materialNumbers = new()
     { 4, "interface" },
 };
 
-RegularParallelepipedalFiniteElementMesh mesh = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
+//RegularParallelepipedalFiniteElementMesh mesh = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", materialNumbers);
 
 //Dictionary<string, IMaterial> Materials = new()
 //{
@@ -489,25 +499,25 @@ Dictionary<string, IMaterial> Materials = new()
 //    { "5", new Material(false, false, true, false, lambda => 0, sigma => 0, epsilon => 0, mu => 0, (theta, t) => 0, (htheta, t) => new Vector3D(htheta.X + htheta.Y + htheta.Z, htheta.X + htheta.Y + htheta.Z, htheta.X + htheta.Y + htheta.Z), (hext, t) => Vector3D.Zero, (ug, t) => 0, (ag, t) => Vector3D.Zero, (f, t) => 0, (fv, t) => Vector3D.Zero) }
 //};
 
-double[] t = [0, 0.19];
+//double[] t = [0, 0.19];
 
-RefineParams refineParams = new() { splitCount = { 19 }, stretchRatio = { 1 } };
-TimeMesh timeMesh = new(t, refineParams);
+//RefineParams refineParams = new() { splitCount = { 19 }, stretchRatio = { 1 } };
+//TimeMesh timeMesh = new(t, refineParams);
 
-//EllipticProblem problem = new(mesh, Materials);
+////EllipticProblem problem = new(mesh, Materials);
 
-//VectorParabolicProblem problem = new(mesh, timeMesh, x => Vector3D.Zero, Materials);
+////VectorParabolicProblem problem = new(mesh, timeMesh, x => Vector3D.Zero, Materials);
 
-//VectorScalarEllipticProblem problem = new(mesh, Materials);
+////VectorScalarEllipticProblem problem = new(mesh, Materials);
 
-VectorScalarParabolicProblem problem = new(mesh, timeMesh, Materials);
+//VectorScalarParabolicProblem problem = new(mesh, timeMesh, Materials);
 
-//VectorEllipticProblem problem = new(mesh, Materials);
+////VectorEllipticProblem problem = new(mesh, Materials);
 
-problem.Prepare();
-VectorScalarParabolicSolution solution = new(mesh, timeMesh, Materials);
-//VectorScalarEllipticSolution solution = new(mesh, Materials);
-problem.Solve(solution);
+//problem.Prepare();
+//VectorScalarParabolicSolution solution = new(mesh, timeMesh, Materials);
+////VectorScalarEllipticSolution solution = new(mesh, Materials);
+//problem.Solve(solution);
 
 //Func<Vector3D, double> RealFunc = x => x.X * x.Y * x.Z + x.X * x.Y + x.X * x.Z + x.Y * x.Z + x.X + x.Y + x.Z + 5;
 //Func<Vector3D, double, Vector3D> RealFunc = (x, t) => new Vector3D(x.Y * t, x.Z * t, x.X * t);
@@ -547,7 +557,7 @@ problem.Solve(solution);
 
 
 
-bool flag = true;
+bool flag = false;
 
 //while (flag)
 //{
@@ -613,17 +623,79 @@ bool flag = true;
 //    flag = bool.Parse(Console.ReadLine()!);
 //}
 
-Vector3D[] points =  [ new Vector3D(0.09, 0, 0),       new Vector3D(0.11, 0, 0),       new Vector3D(0.3, 0, 0),
-                       new Vector3D(0, 0, 0.09),       new Vector3D(0, 0, 0.11),       new Vector3D(0, 0, 0.3),
-                       new Vector3D(0.09, 0.09, 0.09), new Vector3D(0.11, 0.11, 0.11), new Vector3D(0.3, 0.3, 0.3) ];
+//Vector3D[] points =  [ new Vector3D(0.09, 0, 0),       new Vector3D(0.11, 0, 0),       new Vector3D(0.3, 0, 0),
+//                       new Vector3D(0, 0, 0.09),       new Vector3D(0, 0, 0.11),       new Vector3D(0, 0, 0.3),
+//                       new Vector3D(0.09, 0.09, 0.09), new Vector3D(0.11, 0.11, 0.11), new Vector3D(0.3, 0.3, 0.3) ];
 
-WriteResultsToFile();
-while (flag) // curr vkr
+//WriteResultsToFile();
+
+Vector3D[] points = [ new Vector3D(1, 1, 0), new Vector3D(5, 1, 0), new Vector3D(1, 6, 0), new Vector3D(5, 6, 0), new Vector3D(3, 3.5, 0) ];
+
+IFiniteElement[] elems = [new QuadraticTriangularFiniteElementWithNumInteg("scalarVolume", [0, 1, 4]),
+            new QuadraticTriangularFiniteElementWithNumInteg("scalarVolume", [1, 3, 4]),
+new QuadraticTriangularFiniteElementWithNumInteg("scalarVolume", [3, 2, 4]),
+new QuadraticTriangularFiniteElementWithNumInteg("scalarVolume", [2, 0, 4]),
+new QuadraticStraightFiniteElement("firstBoundary", [0, 2]),
+new QuadraticStraightFiniteElement("secondBoundary", [0, 1]),
+new QuadraticStraightFiniteElement("thirdBoundary1", [1, 3]),
+new QuadraticStraightFiniteElement("thirdBoundary2", [2, 3])];
+
+FiniteElementMesh mesh2 = new(elems, points);
+
+string path = "C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh";
+string path2 = Path.Combine(path, "mesh.txt");
+
+Func<Vector3D, double, double> uReal = (p, t) => p.X + p.Y + t * p.X * p.Y;
+Func<Vector3D, double, Vector3D> graduReal = (p, t) => new(1 + t * p.Y, 1 + t * p.X, 0);
+
+IDictionary<string, IMaterial> materials = MaterialsFactory.CreateMaterials(path);
+(ITimeMesh tMesh, Func<Vector3D, double> initFunc) = TimeMeshFactory<double>.CreateTimeMesh(path);
+
+//ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+//ParabolicProblem problem = new(mesh2, tMesh, initFunc, materials);
+//EllipticProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), materials);
+problem.Prepare();
+
+ParabolicSolution solution = new(problem.Mesh, tMesh, path);
+
+problem.Solve(solution);
+
+Console.WriteLine("Введите количество точек для проверки: ");
+int k = int.Parse(Console.ReadLine());
+
+Random random = new();
+for (int i = 0; i < k; ++i)
+{
+    int time = random.Next(1, 11);
+    solution.Time = time;
+    time = (int)solution.Time;
+    Console.WriteLine($"Установленное время t = {solution.Time}");
+
+    double min = 1;
+    double maxX = 5;
+    double maxY = 6;
+
+    (double x, double y) = (random.NextDouble() * (maxX - min) + min, random.NextDouble() * (maxY - min) + min);
+
+    Vector3D p = new(x, y, 0);
+
+    Console.WriteLine($"Значение в точке {p} численного u = {solution.Value(p)}");
+    Console.WriteLine($"Значение в точке {p} искомого u = {uReal(p, time)}");
+
+    Console.WriteLine($"Значение в точке {p} численного gradu = {solution.Gradient(p)}");
+    Console.WriteLine($"Значение в точке {p} искомого gradu = {graduReal(p, time)}");
+
+}
+
+while (!flag) // curr vkr
 {
     Console.WriteLine("Введите время: ");
     double time = double.Parse(Console.ReadLine()!);
 
     solution.Time = time;
+
+    Console.WriteLine($"Установленное время t = {solution.Time}");
 
     Console.WriteLine("Введите x: ");
     double x = double.Parse(Console.ReadLine()!);
@@ -636,44 +708,41 @@ while (flag) // curr vkr
 
     Vector3D point = new Vector3D(x, y, z);
 
-    // Console.WriteLine($"Значение в точке численного A ({x}; {y}; {z}) = " + solution.Vector(point));
-    //Console.WriteLine($"Значение в точке численного V ({x}; {y}; {z}) = " + solution.Value(point));
+    Console.WriteLine($"Значение в точке {point} численного u = {solution.Value(point)}");
+    Console.WriteLine($"Значение в точке {point} искомого u = {uReal(point, time)}");
 
-    Console.WriteLine($"Значение в точке численного H ({x}; {y}; {z}) = " + solution.H(point));
-    //Console.WriteLine($"Значение в точке реального H ({x}; {y}; {z}) = " + RealHext(point, 1));
-
-    Console.WriteLine($"Значение в точке численного B ({x}; {y}; {z}) = " + solution.B(point));
-    //Console.WriteLine($"Значение в точке реального B ({x}; {y}; {z}) = " + Constants.Mu0 * RealHext(point, 1));
+    Console.WriteLine($"Значение в точке {point} численного gradu = {solution.Gradient(point)}");
+    Console.WriteLine($"Значение в точке {point} искомого gradu = {graduReal(point, time)}");
 
     Console.WriteLine("Хотите продолжить?");
 
-    flag = bool.Parse(Console.ReadLine()!);
+    flag = Console.ReadLine() == "n";
 }
 
-void WriteResultsToFile(string path = "")
-{
-    if (path.Length == 0)
-        path = "ParabolicProblemSolutionAtPoints";
+//void WriteResultsToFile(string path = "")
+//{
+//    if (path.Length == 0)
+//        path = "ParabolicProblemSolutionAtPoints";
 
-    if (Directory.Exists(path))
-        Directory.Delete(path, true);
+//    if (Directory.Exists(path))
+//        Directory.Delete(path, true);
 
-    Directory.CreateDirectory(path!);
+//    Directory.CreateDirectory(path!);
 
-    foreach(var p in points)
-    {
-        using (StreamWriter writer = new StreamWriter(Path.Combine(path, p.ToString() + ".txt"), false))
-        {
-            for (int i = 0; i < timeMesh.Size(); ++i)
-            {
-                solution.Time = timeMesh[i];
-                writer.WriteLine($"{solution.Time:F2}    {solution.B(p).X:E12}   {solution.B(p).Y:E12}   {solution.B(p).Z:E12}   {solution.B(p).Norm:E12}");
-            }
-        }
-    }
+//    foreach(var p in points)
+//    {
+//        using (StreamWriter writer = new StreamWriter(Path.Combine(path, p.ToString() + ".txt"), false))
+//        {
+//            for (int i = 0; i < timeMesh.Size(); ++i)
+//            {
+//                solution.Time = timeMesh[i];
+//                writer.WriteLine($"{solution.Time:F2}    {solution.B(p).X:E12}   {solution.B(p).Y:E12}   {solution.B(p).Z:E12}   {solution.B(p).Norm:E12}");
+//            }
+//        }W
+//    }
 
-    Console.WriteLine("Done");
-}
+//    Console.WriteLine("Done");
+//}
 
 
 //IMasterElement<Vector2D, double, Vector3D> ME = SquareMasterElementLinearScalarBasis.GetInstance();

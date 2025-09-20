@@ -5,7 +5,7 @@ Lambda
 Sigma
 5
 F
--10 * (1 + p.Y * t) / p.X + 5 * p.X * p.Y
+5 * p.X * p.Y
 firstBoundary 2 1
 Ug
 1 + p.Y + t * p.Y

@@ -93,6 +93,7 @@ namespace FEM
 
     public interface IProblem
     {
+        enum CoordinateSystem { Cartesian, Cylindrical }
         IDictionary<string, IMaterial> Materials { get; }
         void Prepare();
         void Solve(ISolution result);

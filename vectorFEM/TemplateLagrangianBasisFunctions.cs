@@ -1,3 +1,4 @@
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,56 @@ namespace Core
         {
             x => -1,
             x => 1
+        };
+    }
+
+    public static class TrianglesLinearBasis
+    {
+        public static readonly Func<Vector2D, double>[] Phi =
+        {
+            p => 1 - p.X - p.Y,
+            p => p.Y,
+            p => p.X
+        };
+    }
+
+    public static class TrianglesLinearBasisGradients
+    {
+        public static readonly Func<Vector2D, Vector2D>[] Phi =
+        {
+            p => new(-1, -1),
+            p => new(0, 1),
+            p => new(1, 0)
+        };
+    }
+
+    public static class TrianglesQuadraticBasis
+    {
+        static readonly Func<Vector2D, double>[] phi = TrianglesLinearBasis.Phi;
+
+        public static readonly Func<Vector2D, double>[] Phi =
+        {
+            p => phi[0](p) * (2 * phi[0](p) - 1),
+            p => phi[1](p) * (2 * phi[1](p) - 1),
+            p => phi[2](p) * (2 * phi[2](p) - 1),
+            p => 4 * phi[0](p) * phi[1](p),
+            p => 4 * phi[1](p) * phi[2](p),
+            p => 4 * phi[0](p) * phi[2](p)
+        };
+    }
+
+    public static class TrianglesQuadraticBasisGradients
+    {
+        static readonly Func<Vector2D, double>[] phi = TrianglesLinearBasis.Phi;
+
+        public static readonly Func<Vector2D, Vector2D>[] Phi =
+        {
+            p => new(1 - 4 * phi[0](p), 1 - 4 * phi[0](p)),
+            p => new(0, 4 * phi[1](p) - 1),
+            p => new(4 * phi[2](p) - 1, 0),
+            p => new(-4 * phi[1](p), 4 * (phi[0](p) - phi[1](p))),
+            p => new(4 * phi[1](p), 4 * phi[2](p)),
+            p => new(4 * (phi[0](p) - phi[2](p)), -4 * phi[2](p))
         };
     }
 

@@ -22,8 +22,8 @@ namespace Core
             this.path = path;
             this.materialNumber = materialNumber;
 
-            if (!Path.Exists(path))
-                throw new ArgumentException("The path to the mesh folder is incorrect");
+            if (!Directory.Exists(path))
+                throw new ArgumentException("The path to the mesh folder is incorrect", nameof(path));
 
             InputCalculationArea();
             InputBoundaryConditionsArea();
