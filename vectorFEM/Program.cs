@@ -133,8 +133,10 @@ Console.WriteLine($"Value = {Math.Sqrt(value)}");
 
 */
 
-RegularRectangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", RegularRectangularFiniteElementMesh.Dimension.D2);
+//RegularRectangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", RegularRectangularFiniteElementMesh.Dimension.D2);
 
+IrregularTriangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh\\NewMesh'");
+m.CreateFilesWithMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
 double func(double x, double y, double z)
 {
     return 10 * Math.Pow(x, 9) * 10 * Math.Pow(y, 9) * 10 * Math.Pow(z, 9);

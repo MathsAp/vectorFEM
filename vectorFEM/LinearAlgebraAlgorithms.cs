@@ -159,6 +159,20 @@ public static class LinearAlgebraAlgorithms
         return result;
     }
 
+    public static Vector3D IntersectTwoSegments(Vector3D p1, Vector3D p2, Vector3D q1, Vector3D q2)
+    {
+        Vector3D r = p2 - p1;
+        Vector3D s = q2 - q1;
+        Vector3D w = q1 - p1;
+
+        Vector3D rs = Vector3D.Cross(r, s);
+        double t = Vector3D.Cross(w, s) * rs / (rs * rs);
+
+        Vector3D pp = p1 + t * r;
+
+        return p1 + t * r;
+    }
+
     public static void PrintMatrix(double[,] matrix)
     {
         int rows = matrix.GetLength(0);
