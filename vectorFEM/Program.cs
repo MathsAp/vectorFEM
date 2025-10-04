@@ -135,8 +135,8 @@ Console.WriteLine($"Value = {Math.Sqrt(value)}");
 
 //RegularRectangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh", RegularRectangularFiniteElementMesh.Dimension.D2);
 
-IrregularTriangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh\\NewMesh'");
-m.CreateFilesWithMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
+//IrregularTriangularFiniteElementMesh m = new("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh\\NewMesh'");
+//m.CreateFilesWithMesh("C:\\Users\\bossf\\source\\repos\\vectorFEM\\vectorFEM\\Mesh");
 double func(double x, double y, double z)
 {
     return 10 * Math.Pow(x, 9) * 10 * Math.Pow(y, 9) * 10 * Math.Pow(z, 9);
@@ -652,10 +652,14 @@ Func<Vector3D, double, Vector3D> graduReal = (p, t) => new(1 + t * p.Y, 1 + t * 
 IDictionary<string, IMaterial> materials = MaterialsFactory.CreateMaterials(path);
 (ITimeMesh tMesh, Func<Vector3D, double> initFunc) = TimeMeshFactory<double>.CreateTimeMesh(path);
 
-ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+Math.Sqrt(2);
+//ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
 //ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
 //ParabolicProblem problem = new(mesh2, tMesh, initFunc, materials);
 //EllipticProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), materials);
+IrregularTriangularFiniteElementMesh m = new(path);
+m.CreateFilesWithMesh(path);
+ParabolicProblem problem = new(m, tMesh, initFunc, materials);
 problem.Prepare();
 
 ParabolicSolution solution = new(problem.Mesh, tMesh, path);
