@@ -1,6 +1,10 @@
-5
+9
 scalarVolume 0
-firstBoundary1 1
+firstBoundary 1
 secondBoundary 2
-firstBoundary2 3
-firstBoundary3 4
+thirdBoundary1 3
+thirdBoundary2 4
+dd 5
+dd 6
+dd 7
+dd 8

@@ -49,7 +49,7 @@ public class IrregularTriangularFiniteElementMesh : IFiniteElementMesh
 
     Dictionary<int, string> GetMaterialNumbers()
     {
-        Dictionary<int, string> materialNumbers = new();
+        Dictionary<int, string> materialNumbers = [];
 
         using (StreamReader reader = new(Path.Combine(path, "materials.txt")))
         {
@@ -269,14 +269,6 @@ public class IrregularTriangularFiniteElementMesh : IFiniteElementMesh
             quadVertexNumber[2]
         ];
 
-        //tr1[0] = vertexNumbers[s * pN + p];
-        //tr1[1] = vertexNumbers[s * pN + p + 1];
-        //tr1[2] = vertexNumbers[(s + 1) * pN + p];
-
-        //tr2[0] = vertexNumbers[s * pN + p + 1];
-        //tr2[1] = vertexNumbers[(s + 1) * pN + p + 1];
-        //tr2[2] = vertexNumbers[(s + 1) * pN + p];
-
         return (tr1, tr2);
     }
 
@@ -317,8 +309,6 @@ public class IrregularTriangularFiniteElementMesh : IFiniteElementMesh
                 Vector3D q1 = vertex[edges[h1][p]];
                 Vector3D q2 = vertex[edges[h2][p]];
 
-                Vector3D pp = LinearAlgebraAlgorithms.IntersectTwoSegments(p1, p2, q1, q2);
-
                 newVertex.Add(LinearAlgebraAlgorithms.IntersectTwoSegments(p1, p2, q1, q2));
                 vertexNumbers[s * pN + p] = currVertex++;
             }
@@ -329,7 +319,7 @@ public class IrregularTriangularFiniteElementMesh : IFiniteElementMesh
 
     public void CreateFilesWithMesh(string path = "")
     {
-        using (StreamWriter writer = new StreamWriter(Path.Combine(path, "triangles.txt")))
+        using (StreamWriter writer = new(Path.Combine(path, "triangles.txt")))
         {
             foreach (var elem in Elements)
             {
@@ -338,7 +328,7 @@ public class IrregularTriangularFiniteElementMesh : IFiniteElementMesh
             }
         }
 
-        using (StreamWriter writer = new StreamWriter(Path.Combine(path, "vertices.txt")))
+        using (StreamWriter writer = new(Path.Combine(path, "vertices.txt")))
         {
             foreach (var v in Vertex)
             {

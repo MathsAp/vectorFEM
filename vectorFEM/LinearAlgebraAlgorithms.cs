@@ -168,8 +168,6 @@ public static class LinearAlgebraAlgorithms
         Vector3D rs = Vector3D.Cross(r, s);
         double t = Vector3D.Cross(w, s) * rs / (rs * rs);
 
-        Vector3D pp = p1 + t * r;
-
         return p1 + t * r;
     }
 

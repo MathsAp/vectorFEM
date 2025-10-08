@@ -46,8 +46,8 @@ def main():
 
     # Отмечаем вершины и их номера
     for i, (x, y) in enumerate(vertices):
-        ax.plot(x, y, 'ro', markersize=4)
-        ax.text(x + 0.02, y + 0.02, str(i), fontsize=8, color='red')
+        ax.plot(x, y, 'ro', markersize=1)
+        #ax.text(x + 0.02, y + 0.02, str(i), fontsize=8, color='red')
 
     ax.autoscale_view()
     ax.grid(True)
