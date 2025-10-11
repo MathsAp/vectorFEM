@@ -20,16 +20,16 @@ public class PardisoMatrix : IMatrix, IPardisoMatrix<double>
         type = _type;
     }
 
-    public int N { get => ia.Length - 1; }
+    public int N => ia.Length - 1;
     int IPardisoMatrix<double>.n => ia.Length - 1;
 
-    int[] ia = Array.Empty<int>();
+    int[] ia = [];
     ReadOnlySpan<int> IPardisoMatrix<double>.ia => ia;
 
-    int[] ja = Array.Empty<int>();
+    int[] ja = [];
     ReadOnlySpan<int> IPardisoMatrix<double>.ja => ja;
 
-    double[] values = Array.Empty<double>();
+    double[] values = [];
     ReadOnlySpan<double> IPardisoMatrix<double>.a => values;
 
     PardisoMatrixType type;
@@ -141,4 +141,8 @@ public class PardisoMatrix : IMatrix, IPardisoMatrix<double>
         return -1;
     }
 
+    public void MultiplyByVector(ReadOnlySpan<double> x, double[] result)
+    {
+        throw new NotImplementedException();
+    }
 }

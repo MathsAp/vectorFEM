@@ -17,16 +17,16 @@ public class PardisoNonSymmMatrix : IMatrix, IPardisoMatrix<double>
         type = _type;
     }
 
-    public int N { get => ia.Length - 1; }
+    public int N => ia.Length - 1;
     int IPardisoMatrix<double>.n => ia.Length - 1;
 
-    public int[] ia = Array.Empty<int>();
+    public int[] ia = [];
     ReadOnlySpan<int> IPardisoMatrix<double>.ia => ia;
 
-    public int[] ja = Array.Empty<int>();
+    public int[] ja = [];
     ReadOnlySpan<int> IPardisoMatrix<double>.ja => ja;
 
-    public double[] values = Array.Empty<double>();
+    public double[] values = [];
     ReadOnlySpan<double> IPardisoMatrix<double>.a => values;
 
     PardisoMatrixType type;
@@ -129,5 +129,10 @@ public class PardisoNonSymmMatrix : IMatrix, IPardisoMatrix<double>
         }
 
         return -1;
+    }
+
+    public void MultiplyByVector(ReadOnlySpan<double> x, double[] result)
+    {
+        throw new NotImplementedException();
     }
 }

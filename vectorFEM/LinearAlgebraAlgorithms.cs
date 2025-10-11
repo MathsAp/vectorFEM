@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -169,6 +170,59 @@ public static class LinearAlgebraAlgorithms
         double t = Vector3D.Cross(w, s) * rs / (rs * rs);
 
         return p1 + t * r;
+    }
+
+    public static double[] AdditionVectorsWithCoeffs(ReadOnlySpan<double> x, ReadOnlySpan<double> y, double[] result, double coeff1 = 1, double coeff2 = 1)
+    {
+        for (int i = 0; i < x.Length; ++i)
+        {
+            result[i] = coeff1 * x[i] + coeff2 * y[i];
+        }
+
+        return result;
+    }
+
+    public static double[] AdditionVectorsWithCoeffs(ReadOnlySpan<double> x, ReadOnlySpan<double> y, ReadOnlySpan<double> z, double[] result, double coeff1 = 1, double coeff2 = 1, double coeff3 = 1)
+    {
+        for (int i = 0; i < x.Length; ++i)
+        {
+            result[i] = coeff1 * x[i] + coeff2 * y[i] + coeff3 * z[i];
+        }
+
+        return result;
+    }
+
+    public static double[] SubtractionVectorsWithCoeffs(ReadOnlySpan<double> x, ReadOnlySpan<double> y, double[] result, double coeff1 = 1, double coeff2 = 1)
+    {
+        for (int i = 0; i < x.Length; ++i)
+        {
+            result[i] = coeff1 * x[i] - coeff2 * y[i];
+        }
+
+        return result;
+    }
+
+    public static double ScalarProduct(ReadOnlySpan<double> x, ReadOnlySpan<double> y)
+    {
+        double sum = 0; 
+        for (int i = 0; i < x.Length; ++i)
+            sum += x[i] * y[i];
+
+        return sum;
+    }
+
+    public static double EuclideanNorm(ReadOnlySpan<double> x) => Math.Sqrt(ScalarProduct(x, x));
+
+    public static double EuclideanNormDifference(ReadOnlySpan<double> x, ReadOnlySpan<double> y)
+    {
+        double sum = 0;
+        for (int i = 0; i < x.Length; ++i)
+        {
+            double diff = x[i] - y[i];
+            sum += diff * diff;
+        }
+
+        return Math.Sqrt(sum);
     }
 
     public static void PrintMatrix(double[,] matrix)

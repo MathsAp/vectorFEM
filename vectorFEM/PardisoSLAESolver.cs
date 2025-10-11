@@ -8,7 +8,7 @@ using Quasar.Native;
 
 namespace Core;
 
-public class PardisoSLAESolver : ISLAESolver
+public class PardisoSLAESolver : ISLAESolver, IDisposable
 {
     public PardisoSLAESolver(PardisoSLAE slae)
     {

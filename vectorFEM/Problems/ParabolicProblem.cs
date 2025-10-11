@@ -37,7 +37,8 @@ public class ParabolicProblem : IProblem
     public void Prepare()
     {
         FemAlgorithms.EnumerateMeshDofs(Mesh);
-        SLAE = new PardisoSLAE(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+        //SLAE = new PardisoSLAE(new PardisoMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.SymmetricIndefinite));
+        SLAE = new PardisoSLAE(new SparseNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh)));
         //SLAE = new(new PardisoNonSymmMatrix(FemAlgorithms.BuildPortraitFirstStep(Mesh), Quasar.Native.PardisoMatrixType.StructurallySymmetric));
         TimeMesh.ChangeCoefs(GetWeightsForInitialCondition());
     }
@@ -63,14 +64,15 @@ public class ParabolicProblem : IProblem
         }
         );
 
-        using (PardisoSLAESolver SLAESolver = new PardisoSLAESolver(SLAE!))
-        {
+        BiCGStabSLAESolver SLAESolver = new BiCGStabSLAESolver(SLAE!, 1e-15, 10000);
+        //using (PardisoSLAESolver SLAESolver = new PardisoSLAESolver(SLAE!))
+        //{
             SLAESolver.Prepare();
 
             var solutionVector = SLAESolver.Solve();
 
             return solutionVector;
-        }
+        //}
     }
 
     public void Solve(ISolution result)
@@ -80,9 +82,10 @@ public class ParabolicProblem : IProblem
         int tN = TimeMesh.Size();
         double[] timeCoefs = new double[3];
 
-        //Func<Vector3D, Vector3D>? velocity = p => new(p.Y / p.X, p.X, 0);
-        Func<Vector3D, Vector3D>? velocity = null;
-        PardisoSLAESolver? SLAESolver = null;
+        Func<Vector3D, Vector3D>? velocity = p => new(p.Y / p.X, p.X, 0);
+        //Func<Vector3D, Vector3D>? velocity = null;
+        //PardisoSLAESolver? SLAESolver = null;
+        BiCGStabSLAESolver? SLAESolver = null;
 
         for (int iT = 1; iT < tN; ++iT)
         {
@@ -181,8 +184,9 @@ public class ParabolicProblem : IProblem
 
             if (isChanged)
             {
-                SLAESolver?.Dispose();
-                SLAESolver = new PardisoSLAESolver(SLAE!);
+                //SLAESolver?.Dispose();
+                //SLAESolver = new PardisoSLAESolver(SLAE!);
+                SLAESolver = new BiCGStabSLAESolver(SLAE!, 1e-15, 10000);
                 SLAESolver.Prepare();
             }
 
@@ -193,7 +197,7 @@ public class ParabolicProblem : IProblem
             TimeMesh.ChangeCoefs(solutionVector!);
         }
 
-        SLAESolver?.Dispose();
+        //SLAESolver?.Dispose();
     }
 
     double[] GetLocalCoeffs(double[] lc, int[] dofs, double[] coeffs)

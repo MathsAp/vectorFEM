@@ -654,12 +654,13 @@ IDictionary<string, IMaterial> materials = MaterialsFactory.CreateMaterials(path
 
 Math.Sqrt(2);
 //ParabolicProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
-//ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
+ParabolicProblem problem = new(new TriangularFiniteElementMesh(path2), tMesh, initFunc, materials, IProblem.CoordinateSystem.Cylindrical);
 //ParabolicProblem problem = new(mesh2, tMesh, initFunc, materials);
 //EllipticProblem problem = new(new RegularRectangularFiniteElementMesh(path, RegularRectangularFiniteElementMesh.Dimension.D2), materials);
-IrregularTriangularFiniteElementMesh m = new(path);
-m.CreateFilesWithMesh(path);
-ParabolicProblem problem = new(m, tMesh, initFunc, materials);
+
+//IrregularTriangularFiniteElementMesh m = new(path);
+//m.CreateFilesWithMesh(path);
+//ParabolicProblem problem = new(m, tMesh, initFunc, materials);
 problem.Prepare();
 
 ParabolicSolution solution = new(problem.Mesh, tMesh, path);

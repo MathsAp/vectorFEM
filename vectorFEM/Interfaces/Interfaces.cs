@@ -170,6 +170,7 @@ public interface IMatrix
     void AddLocal(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d);
     void AddLocalTransposed(int[] dofsi, int[] dofsj, double[,] matrix, double coeff = 1d);
     void Symmetrize(int dof, double value, double[] RightPart);
+    void MultiplyByVector(ReadOnlySpan<double> x, double[] result);
     void Clear();
 }
 
@@ -183,7 +184,7 @@ public interface ISLAE
     double[] RightPart { get; }
 }
 
-public interface ISLAESolver : IDisposable
+public interface ISLAESolver
 {
     ISLAE SLAE { get; }
     double[] Solve();
